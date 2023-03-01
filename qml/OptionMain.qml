@@ -15,6 +15,7 @@ ColumnLayout {
         option_main.visible = false
         recorder_view.visible = true
         button_record_test.enabled = false
+        $test.begin_record_test()
     }
 
     function button_image_click(){

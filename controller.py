@@ -6,41 +6,42 @@ import json
 from data_service import config, repo
 from service import result_saver, pic_builder, pic_reader, api
 import cv2
-#from VideoCaptureThread import VideoCaptureThread
+from VideoCaptureThread import VideoCaptureThread
+from Recorder import RecorderThread
 
-def captureVideoFromCamera():
-    cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
-    WIDTH = 1920
-    HEIGHT = 1920
-    FILENAME = r'f:\video\myvideo.avi'
-
-    FPS = 24
-    cap.set(cv2.CAP_PROP_FPS, 24)
-    # 建议使用XVID编码,图像质量和文件大小比较都兼顾的方案
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-
-    out = cv2.VideoWriter(FILENAME, fourcc=fourcc, fps=FPS,frameSize=(WIDTH,HEIGHT))
-
-    if not cap.isOpened():
-        print("Cannot open camera")
-        exit()
-    while True:
-        # 逐帧捕获
-        ret, frame = cap.read()
-        # 如果正确读取帧，ret为True
-        if not ret:
-            print("Can't receive frame (stream end?). Exiting ...")
-            break
-        frame = cv2.flip(frame, 1)  # 水平翻转
-        ret = out.write(frame)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # 显示结果帧e
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(1) == ord('q'):  break
-    # 完成所有操作后，释放捕获器
-    out.release()
-    cap.release()
-    cv2.destroyAllWindows()
+# def captureVideoFromCamera():
+#     cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+#     WIDTH = 1920
+#     HEIGHT = 1920
+#     FILENAME = r'f:\video\myvideo.avi'
+#
+#     FPS = 24
+#     cap.set(cv2.CAP_PROP_FPS, 24)
+#     # 建议使用XVID编码,图像质量和文件大小比较都兼顾的方案
+#     fourcc = cv2.VideoWriter_fourcc(*'XVID')
+#
+#     out = cv2.VideoWriter(FILENAME, fourcc=fourcc, fps=FPS,frameSize=(WIDTH,HEIGHT))
+#
+#     if not cap.isOpened():
+#         print("Cannot open camera")
+#         exit()
+#     while True:
+#         # 逐帧捕获
+#         ret, frame = cap.read()
+#         # 如果正确读取帧，ret为True
+#         if not ret:
+#             print("Can't receive frame (stream end?). Exiting ...")
+#             break
+#         frame = cv2.flip(frame, 1)  # 水平翻转
+#         ret = out.write(frame)
+#         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#         # 显示结果帧e
+#         cv2.imshow('frame', frame)
+#         if cv2.waitKey(1) == ord('q'):  break
+#     # 完成所有操作后，释放捕获器
+#     out.release()
+#     cap.release()
+#     cv2.destroyAllWindows()
 
 
 def pic_nums():
@@ -63,6 +64,7 @@ class TestImageProvider(QQuickImageProvider):
 """
 TestController用于传递给前端，响应与测试有关的前端请求（比如作答和测试开始图片初始化，除图片的传递）
 """
+
 
 
 class TestController(QObject):
@@ -119,11 +121,11 @@ class TestController(QObject):
 
         # captureVideoFromCamera()
 
-        # video_source = 0  # 0 for webcam, or path to video file
-        # output_file = 'output.avi'
-        # capture_thread = VideoCaptureThread(video_source, output_file)
-        # capture_thread.setDaemon(True)
-        # capture_thread.start()
+        video_source = 0  # 0 for webcam, or path to video file
+        output_file = 'output.avi'
+        self.capture_thread = VideoCaptureThread(video_source, output_file)
+        self.capture_thread.setDaemon(True)
+        self.capture_thread.start()
 
 
 
@@ -137,6 +139,35 @@ class TestController(QObject):
         result_saver.save_result(repo.username, repo.test_time.strftime('%Y-%m-%d %H:%M:%S'), repo.pics_with_mark,
                                  if_ch_contents=config.get_config("if_ch_contents"),
                                  if_ch_header=config.get_config("if_ch_headers"))
+        self.capture_thread.flag = False
+
+
+    @Slot()
+    def begin_record_test(self):
+
+        video_source = 0
+        output_file = "录音视频.avi"
+        self.capture_thread = VideoCaptureThread(video_source,output_file)
+        self.capture_thread.setDaemon(True)
+        self.capture_thread.start()
+
+    @Slot()
+    def end_record_test(self):
+        self.capture_thread.flag = False
+
+    @Slot()
+    def begin_record(self):
+
+        output_file = "测试录音.wav"
+        self.recorder_thread = RecorderThread(output_file)
+        self.recorder_thread.start()
+
+    @Slot()
+    def end_record(self):
+        self.recorder_thread.flag = False
+
+
+
 
 
 """
@@ -156,6 +187,11 @@ class ConfigController(QObject):
         """
         return config.get_config(key)
 
+    @Slot(str, result="QVariant")
+    def get_question(self,key):
+
+        return config.get_questions(key)
+
     @Slot(result="QString")
     def begin_edit(self):
         """
@@ -173,6 +209,8 @@ class ConfigController(QObject):
         """
         config.set_configs(json.loads(edited_config))
         config.save_config()
+
+
 
 
 test_image_provider = TestImageProvider(QQmlImageProviderBase.Image)

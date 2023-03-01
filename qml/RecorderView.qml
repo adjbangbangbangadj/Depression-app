@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 
+
 ColumnLayout {
 
 
@@ -11,11 +12,11 @@ ColumnLayout {
 
     Text {
         id: question
-        text: qsTr("text")
+        text: qsTr("000")
     }
 
     RowLayout{
-        var question_text = { "question": [{ "content": "你的名字是" }, { "content": "你的性别是" }] }
+
 
         id: record_control
         property int current_question: 0
@@ -30,20 +31,22 @@ ColumnLayout {
         function record_start_click(){
             record_start.enabled = false
             record_stop.enabled = true
+            $test.begin_record()
         }
 
         function record_stop_click(){
             record_stop.enabled = false
             record_next.enabled = true
+            $test.end_record()
         }
 
         function record_next_click(){
             record_next.enabled = false
             record_start.enabled = true
-            question.text = question_text[current_question]
+
             current_question++
 
-
+            question.text = $config.get_question("num"+current_question)
         }
 
 

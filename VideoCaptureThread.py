@@ -2,11 +2,12 @@ import cv2
 import threading
 
 class VideoCaptureThread(threading.Thread):
-    def __init__(self, video_source, output_file):
+    def __init__(self, video_source, output_file, flag = True):
         threading.Thread.__init__(self)
         self.video_source = video_source
         self.output_file = output_file
         self.capture = cv2.VideoCapture(self.video_source)
+        self.flag = flag
         self.fps = int(self.capture.get(cv2.CAP_PROP_FPS))
         self.width = int(self.capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -16,7 +17,7 @@ class VideoCaptureThread(threading.Thread):
         while True:
             ret, frame = self.capture.read()
             frame = cv2.flip(frame, 1) #水平翻转
-            if ret:
+            if ret and self.flag:
                 self.video_writer.write(frame)
             else:
                 break

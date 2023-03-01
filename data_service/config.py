@@ -6,6 +6,8 @@ import path
 _configs = {}
 _config_path = "\\config.json"
 
+_questions = {}
+_questions_path = "\\question.json"
 
 def set_configs(new_configs):
     [set_config(k, v) for k, v in new_configs.items()]
@@ -35,6 +37,22 @@ def read_config():
         global _configs
         _configs = json.load(config_file)
 
+
+def get_questions():
+    return copy(_questions)
+
+def get_questions(key):
+    if key not in _questions:
+        raise Exception(f"can't find question:{key}")
+    return _questions[key]
+
+def read_question():
+    with open(path.executable_path + _questions_path, 'r') as question_file:
+        global _questions
+        _questions = json.load(question_file)
+
+
+read_question()
 
 read_config()
 
