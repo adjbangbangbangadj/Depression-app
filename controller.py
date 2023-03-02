@@ -153,8 +153,8 @@ class TestController(QObject):
     def begin_record_test(self):
 
         video_source = 0
-        # output_file = repo.currentPath + "录音视频.avi"
-        output_file = './results/' + str(repo.test_time).replace(' ', '_').replace(':',".") + '/录音视频.avi'
+        output_file = './results/' + str(repo.test_time).replace(' ', '_').replace(':',".") + "/录音视频.avi"
+        # output_file = repo.currentPath
         self.capture_thread = VideoCaptureThread(video_source,output_file)
         self.capture_thread.setDaemon(True)
         self.capture_thread.start()
@@ -163,10 +163,10 @@ class TestController(QObject):
     def end_record_test(self):
         self.capture_thread.flag = False
 
-    @Slot()
-    def begin_record(self):
+    @Slot(int)
+    def begin_record(self, num):
 
-        output_file = "测试录音.wav"
+        output_file = './results/' + str(repo.test_time).replace(' ', '_').replace(':',".") + "/ 录音" + str(num) + ".wav"
         self.recorder_thread = RecorderThread(output_file)
         self.recorder_thread.setDaemon(True)
         self.recorder_thread.start()
