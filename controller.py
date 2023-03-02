@@ -1,10 +1,11 @@
-from PySide2.QtCore import QObject, Slot
-from PySide2.QtQml import QQmlImageProviderBase
-from PySide2.QtQuick import QQuickImageProvider
+from PySide6.QtCore import QObject, Slot
+from PySide6.QtQml import QQmlImageProviderBase
+from PySide6.QtQuick import QQuickImageProvider
 import datetime
 import json
-from data_service import config, repo
-from service import result_saver, pic_builder, pic_reader, api
+import vars
+# from data_service import config, repo
+from service import image_utils, pic_builder, api, result_writer
 import cv2
 #from VideoCaptureThread import VideoCaptureThread
 
@@ -56,8 +57,8 @@ TestImageProvider用于（在main.py里）传递给前端，响应前端对于�
 class TestImageProvider(QQuickImageProvider):
     def requestImage(self, id, size, requestedSize):
         if id == "background":
-            return repo.interval_background
-        return repo.get_pic(int(id))
+            return vars.interval_background
+        return vars.get_pic(int(id))
 
 
 """
@@ -79,7 +80,7 @@ class TestController(QObject):
         """
         保存用户对于图片的选择，以及做出选择的时长
         """
-        repo.mark(pic_index, usertag, duration)
+        vars.mark(pic_index, usertag, duration)
         if config.get_config("if_use_api"):
             api.mark(1)
 
@@ -98,11 +99,11 @@ class TestController(QObject):
         :param username: 用户输入的用户名
         """
         config.read_config()
-        repo.test_time = datetime.datetime.now()
-        repo.username = username
+        vars.test_time = datetime.datetime.now()
+        vars.username = username
         # config.read_config()
         # 构建并保存图片(根据设置选择图片源)
-        repo.pics_with_mark = pic_reader.init_pics(*pic_nums(),
+        vars.pics_with_mark = image_utils.read_images(*pic_nums(),
                                                    if_allowed_pics_dup=config.get_config("if_allowed_pics_dup")) \
             if config.get_config("if_use_en_pics") \
             else pic_builder.build_pics_consider_gender(
@@ -110,8 +111,8 @@ class TestController(QObject):
                 if_same_neu_pic_for_background=config.get_config("if_same_neu_pic_for_background"),
                 if_same_neu_pic_for_neu=config.get_config("if_same_neu_pic_for_neu"))
         # 构建并保存背景
-        repo.interval_background = pic_builder.build_background_pic(
-            *(lambda x: [x.size(), x.format()])(repo.get_pic(0)), config.get_config("background_color"))
+        vars.interval_background = pic_builder.build_background_pic(
+            *(lambda x: [x.size(), x.format()])(vars.get_pic(0)), config.get_config("background_color"))
         # print(test_image_provider.requestImage("1",None,None))
         # 调用api
         if config.get_config("if_use_api"):
@@ -134,7 +135,7 @@ class TestController(QObject):
         测试结束时触发此函数，调用服务将结果写入磁盘
         :rtype: object
         """
-        result_saver.save_result(repo.username, repo.test_time.strftime('%Y-%m-%d %H:%M:%S'), repo.pics_with_mark,
+        result_writer.save_result(vars.username, vars.test_time.strftime('%Y-%m-%d %H:%M:%S'), vars.pics_with_mark,
                                  if_ch_contents=config.get_config("if_ch_contents"),
                                  if_ch_header=config.get_config("if_ch_headers"))
 
@@ -144,35 +145,28 @@ ConfigController，用于响应与设置配置有关的前端请求
 """
 
 
+# @QmlElement
 class ConfigController(QObject):
-    # @Slot(str, result="QString")
-    # def get_confines(self):
-    #     return pic_builder.get_confines(*pic_nums())
-
     @Slot(str, result="QVariant")
     def get_config(self, key):
-        """
-        测试时读取相应的单条设置，比如间隔、图片数等
-        """
-        return config.get_config(key)
+        return vars.config[key]
 
-    @Slot(result="QString")
-    def begin_edit(self):
-        """
-        点击设置按钮触发此函数，返回给前端当前设置
-        :return: 当前设置，以json格式保存在string类型中
-        """
-        config.read_config()
-        return json.dumps(config.get_configs())
+    @Slot(str, result="QString")
+    def get_default_configs(self, section):
+            return json.dumps(dict(vars.config['DEFAULT'][section]))
+
+    @Slot(str, result="QString")
+    def get_configs(self, section):
+            return json.dumps(dict(vars.config[section]))
 
     @Slot(str)
-    def end_edit(self, edited_config):
-        """
-        点击保存设置触发此函数，保存前端传递来的设置
-        :param edited_config: 前端传递来的设置，以json格式保存在string类型中
-        """
-        config.set_configs(json.loads(edited_config))
-        config.save_config()
+    def set_configs(self, edited_config_json):
+        ...
+        # repo.config.set_configs(json.loads(edited_config))
+        # config.save_config()
+
+class Controller(QObject):
+    ...
 
 
 test_image_provider = TestImageProvider(QQmlImageProviderBase.Image)

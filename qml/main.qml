@@ -99,7 +99,7 @@ Window {
         anchors.margins: 30
     }
 
-    TestView{
+    PicTestView{
         id: test_view
         visible: false
         anchors.fill: parent
