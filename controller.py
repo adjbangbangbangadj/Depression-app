@@ -1,8 +1,13 @@
+import os
+import time
+
 from PySide2.QtCore import QObject, Slot
 from PySide2.QtQml import QQmlImageProviderBase
 from PySide2.QtQuick import QQuickImageProvider
 import datetime
 import json
+
+import path
 from data_service import config, repo
 from service import result_saver, pic_builder, pic_reader, api
 import cv2
@@ -94,13 +99,15 @@ class TestController(QObject):
             api.mark(0)
 
     @Slot(str)
-    def begin_test(self, username):
+    def begin_image_test(self, username):
         """
         点击开始测试按钮触发此函数，保存当前时间、用户名，构建图片传递并保存至repo（TestImageProvider从那里取图片），调用api
         :param username: 用户输入的用户名
         """
+
+
         config.read_config()
-        repo.test_time = datetime.datetime.now()
+
         repo.username = username
         # config.read_config()
         # 构建并保存图片(根据设置选择图片源)
@@ -122,7 +129,7 @@ class TestController(QObject):
         # captureVideoFromCamera()
 
         video_source = 0  # 0 for webcam, or path to video file
-        output_file = 'output.avi'
+        output_file = './results/' + str(repo.test_time).replace(' ', '_').replace(':',".") + '/图片测试视频.avi'
         self.capture_thread = VideoCaptureThread(video_source, output_file)
         self.capture_thread.setDaemon(True)
         self.capture_thread.start()
@@ -131,7 +138,7 @@ class TestController(QObject):
 
 
     @Slot()
-    def end_test(self):
+    def end_image_test(self):
         """
         测试结束时触发此函数，调用服务将结果写入磁盘
         :rtype: object
@@ -146,7 +153,8 @@ class TestController(QObject):
     def begin_record_test(self):
 
         video_source = 0
-        output_file = "录音视频.avi"
+        # output_file = repo.currentPath + "录音视频.avi"
+        output_file = './results/' + str(repo.test_time).replace(' ', '_').replace(':',".") + '/录音视频.avi'
         self.capture_thread = VideoCaptureThread(video_source,output_file)
         self.capture_thread.setDaemon(True)
         self.capture_thread.start()
@@ -160,13 +168,20 @@ class TestController(QObject):
 
         output_file = "测试录音.wav"
         self.recorder_thread = RecorderThread(output_file)
+        self.recorder_thread.setDaemon(True)
         self.recorder_thread.start()
 
     @Slot()
     def end_record(self):
         self.recorder_thread.flag = False
 
-
+    @Slot()
+    def new_folder(self):
+        # repo.test_time = datetime.datetime.now()
+        repo.test_time  = datetime.datetime.now()
+        repo.currentPath = "\\results\\" + str(repo.test_time).replace(' ', '_').replace(':',".") + "\\"
+        repo.folder = str(repo.test_time).replace(' ', '_').replace(':',".")
+        os.makedirs(r'%s%s'%(os.getcwd()+"\\results\\" ,str(repo.test_time).replace(' ', '_').replace(':',".")))
 
 
 

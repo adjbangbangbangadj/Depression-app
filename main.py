@@ -1,4 +1,5 @@
 # This Python file uses the following encoding: utf-8
+import os
 
 from PySide2.QtGui import QGuiApplication
 from PySide2.QtQml import QQmlApplicationEngine
@@ -15,6 +16,9 @@ if __name__ == "__main__":
     context.setContextProperty("$config", controller.config_controller)
     engine.addImageProvider("test", controller.test_image_provider)
     engine.load(path.executable_path + "\\qml\\main.qml")
+
+    if(not path.result_fold):
+        os.mkdir(r'%s/%s'%(os.getcwd(), "\\results\\"))
 
     if not engine.rootObjects():
         sys.exit(-1)

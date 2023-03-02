@@ -17,12 +17,13 @@ Window {
 //        $test.begin_test(username)
         start_view.visible = false
         option_main.visible = true
+        $test.new_folder()
 //        test_view.visible = true
 //        test_view.begin_test()
 
     }
-    function end_test(){
-        $test.end_test()
+    function end_image_test(){
+        $test.end_image_test()
         test_view.visible = false
 //        result_view.visible = true
         option_main.visible = true
@@ -104,7 +105,7 @@ Window {
         visible: false
         anchors.fill: parent
         anchors.margins: 30
-        onTestEnd: root.end_test()
+        onTestEnd: root.end_image_test()
     }
 
 

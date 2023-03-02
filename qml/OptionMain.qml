@@ -19,15 +19,15 @@ ColumnLayout {
     }
 
     function button_image_click(){
-        $test.begin_test(username)
+        $test.begin_image_test(username)
         option_main.visible = false
         test_view.visible = true
         button_image_test.enabled = false
-        test_view.begin_test()
+        test_view.begin_image_test()
     }
 
     function button_end_click(){
-
+        root.close()
     }
 
     Button{

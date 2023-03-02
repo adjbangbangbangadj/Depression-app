@@ -3,7 +3,8 @@ pics_with_mark = {}
 interval_background = None
 test_time = None
 username = None
-
+# currentPath = "\\results\\" + test_time + "\\"
+currentPath = None
 
 def mark(pic_index, usertag, duration):
     pics_with_mark[pic_index]['user-label'] = usertag

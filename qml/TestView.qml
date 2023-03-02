@@ -44,7 +44,7 @@ RowLayout {
             interval_timer.start()
         }
         else
-            end_test()
+            end_image_test()
     }
    function next_turn(){//下一张图片
         attrs.current_turn_index++
@@ -52,7 +52,7 @@ RowLayout {
         test_timer.start()
         $test.turn_start()
     }
-    function begin_test(){//开始测试
+    function begin_image_test(){//开始测试
         state = 'testing'
         test_timer.start()
         focus = true
@@ -64,7 +64,7 @@ RowLayout {
         attrs.if_background_fill = $config.get_config("if_background_fill")
     }
 
-    function end_test(){//结束测试
+    function end_image_test(){//结束测试
         state = 'inactive'
         testEnd()
     }
