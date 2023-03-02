@@ -1,9 +1,10 @@
 from PySide6.QtCore import QObject, Slot
 from PySide6.QtQml import QmlElement
+from csv import DictWriter
+from pathlib import Path
 import vars
-from ..neuracle_lib.triggerBox import api
+from ..service.neuracle_api import mark, start
 from ..service.image_utils import build_images_consider_gender, read_images, build_background_image
-from ..service.result_writer import save_csv
 
 @QmlElement
 class ImageTestBridge(QObject):
@@ -19,7 +20,7 @@ class ImageTestBridge(QObject):
         image['user_tag'] = user_tag
         image['duration'] = duration
         if self.conf["if_use_api"]:
-            api.mark(1)
+            mark(1)
 
     @Slot()
     def turn_start(self):
@@ -27,7 +28,7 @@ class ImageTestBridge(QObject):
         每轮图片开始的时候进行打标
         """
         if self.conf["if_use_api"]:
-            api.mark(0)
+            mark(0)
 
     @Slot(str)
     def test_start(self):
@@ -48,7 +49,7 @@ class ImageTestBridge(QObject):
 
         # 调用api
         if self.conf["if_use_api"]:
-            api.start()
+            start()
 
         # captureVideoFromCamera()
 
@@ -66,4 +67,10 @@ class ImageTestBridge(QObject):
         test_result = []
         for i in self.image_infos:
             test_result.append(dict(name=i['name'],tag=i['tag'], user_tag=i['user_tag'], duration=i['duration']))
-        save_csv(test_result, vars.test_info.result_dir)
+        csv_filename = vars.test_info.result_dir / Path(vars.test_info.result_dir.name + '.csv')
+
+        with open(csv_filename, 'w', encoding='utf-8-sig') as save_file:
+            writer = DictWriter(save_file, fieldnames=test_result[0].keys(), lineterminator='\n')
+            writer.writeheader()
+            writer.writerows(test_result)
+
