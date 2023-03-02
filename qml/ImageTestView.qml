@@ -25,7 +25,7 @@ RowLayout {
     ]
     QtObject{
         id: attrs
-        property string pic_source: "image://test/0"
+        property string image_source: "image://test/0"
         property int current_turn_index: 1
         property int turn_num: 20
         property int answer_duration: 3000
@@ -57,7 +57,7 @@ RowLayout {
         test_timer.start()
         focus = true
         //initialize configs
-        attrs.turn_num = $config.get("pos_pic_num")+$config.get("neu_pic_num")+$config.get("neg_pic_num")
+        attrs.turn_num = $config.get("pos_image_num")+$config.get("neu_image_num")+$config.get("neg_image_num")
         attrs.answer_duration = $config.get("answer_duration")
         attrs.interval_duration = $config.get("interval_duration")
         attrs.if_end_immediately_after_answer = $config.get("if_end_immediately_after_answer")

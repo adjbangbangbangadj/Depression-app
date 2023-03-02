@@ -1,17 +1,24 @@
 from PySide6.QtCore import QObject, Slot
-import conf
+from PySide6.QtQml import QmlElement
+import vars
 from ..neuracle_lib.triggerBox import api
+from ..service.image_utils import build_images_consider_gender, read_images, build_background_image
+from ..service.result_writer import save_csv
 
+@QmlElement
 class ImageTestBridge(QObject):
     def __init__(self):
-        self.image_infos = {}
+        self.conf = vars.conf['image_test']
+        self.image_infos:list[dict] = []
+        self.interval_background = ...
+        self.image_nums = [int(self.conf[f]) for f in ["pos_image_num", "neu_image_num", "neg_image_num"]]
 
     @Slot(int, str, int)
-    def mark(self, image_index, userlabel, duration):
+    def user_answer(self, image_index, user_tag, duration):
         image = self.image_infos[image_index]
-        image['user_label'] = userlabel
+        image['user_tag'] = user_tag
         image['duration'] = duration
-        if conf.get_config("if_use_api"):
+        if self.conf["if_use_api"]:
             api.mark(1)
 
     @Slot()
@@ -19,33 +26,28 @@ class ImageTestBridge(QObject):
         """
         每轮图片开始的时候进行打标
         """
-        if conf.get_config("if_use_api"):
+        if self.conf["if_use_api"]:
             api.mark(0)
 
     @Slot(str)
-    def begin_test(self, username):
-        """
-        点击开始测试按钮触发此函数，保存当前时间、用户名，构建图片传递并保存至repo（TestImageProvider从那里取图片），调用api
-        :param username: 用户输入的用户名
-        """
-        conf.read_config()
-        repo.test_time = datetime.datetime.now()
-        repo.username = username
-        # config.read_config()
+    def test_start(self):
         # 构建并保存图片(根据设置选择图片源)
-        repo.pics_with_mark = pic_reader.read_images(*pic_nums(),
-                                                   if_allowed_pics_dup=conf.get_config("if_allowed_pics_dup")) \
-            if conf.get_config("if_use_en_pics") \
-            else pic_builder.build_pics_consider_gender(
-                *pic_nums(), if_allowed_pics_dup=conf.get_config("if_allowed_pics_dup"),
-                if_same_neu_pic_for_background=conf.get_config("if_same_neu_pic_for_background"),
-                if_same_neu_pic_for_neu=conf.get_config("if_same_neu_pic_for_neu"))
+        if self.conf['dataset'] == 'K': # TODO
+            self.image_infos = read_images(*self.image_nums, if_allowed_images_dup=self.conf["if_allowed_images_dup"])
+        elif self.conf['dataset'] == 'C': # TODO
+            self.image_infos = read_images(*self.image_nums, build_images_consider_gender(
+                *self.image_nums(), if_allowed_images_dup=self.conf["if_allowed_images_dup"],
+                if_same_neu_image_for_background=self.conf["if_same_neu_image_for_background"],
+                if_same_neu_image_for_neu=self.conf["if_same_neu_image_for_neu"]))
+
+        x :dict = {}
+        x.update
         # 构建并保存背景
-        repo.interval_background = pic_builder.build_background_pic(
-            *(lambda x: [x.size(), x.format()])(repo.get_pic(0)), conf.get_config("background_color"))
-        # print(test_image_provider.requestImage("1",None,None))
+        self.interval_background = build_background_image(
+            *(lambda x: [x.size(), x.format()])(self.get_image(0)), self.conf["background_color"])
+
         # 调用api
-        if conf.get_config("if_use_api"):
+        if self.conf["if_use_api"]:
             api.start()
 
         # captureVideoFromCamera()
@@ -57,11 +59,11 @@ class ImageTestBridge(QObject):
         # capture_thread.start()
 
     @Slot()
-    def end_test(self):
+    def test_end(self):
         """
         测试结束时触发此函数，调用服务将结果写入磁盘
-        :rtype: object
         """
-        result_saver.save_result(repo.username, repo.test_time.strftime('%Y-%m-%d %H:%M:%S'), repo.pics_with_mark,
-                                 if_ch_contents=conf.get_config("if_ch_contents"),
-                                 if_ch_header=conf.get_config("if_ch_headers"))
+        test_result = []
+        for i in self.image_infos:
+            test_result.append(dict(name=i['name'],tag=i['tag'], user_tag=i['user_tag'], duration=i['duration']))
+        save_csv(test_result, vars.test_info.result_dir)

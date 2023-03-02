@@ -8,13 +8,8 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-import controller
-import conf
-# import repo
 
-
-
-
+import vars
 
 if __name__ == "__main__":
     # logging
@@ -37,9 +32,9 @@ if __name__ == "__main__":
     engine = QQmlApplicationEngine()
     context = engine.rootContext()
     # context.setContextProperty("$test", controller.test_controller)
-    # context.setContextProperty("$config", controller.config_controller)
-    engine.addImageProvider("test", controller.test_image_provider)
-    engine.load(str(conf.executable_path / Path("qml/test_main.qml")))
+    context.setContextProperty("$config", vars.config)
+    engine.addImageProvider("test", vars.image_provider)
+    engine.load(str(vars.executable_path / Path("qml/test_main.qml")))
 
     if not engine.rootObjects():
         sys.exit(-1)

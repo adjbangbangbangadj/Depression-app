@@ -3,11 +3,10 @@ from PySide6.QtCore import QObject,  Slot
 from pathlib import Path
 from configparser import ConfigParser
 import logging
-import sys
 
 
 
-class Config(QObject):
+class ConfigManager(QObject):
     def __init__(self):
         self.config:ConfigParser = ConfigParser()
 
@@ -26,7 +25,7 @@ class Config(QObject):
     def get(self, name):
         return self.config[name]
 
-    @Slot(str, ...)
+    @Slot(str, str)
     def set_config(self, name, value) -> None:
         self.config[name] = value
 
@@ -56,4 +55,4 @@ class Config(QObject):
 
         ...
 
-config = Config
+conf_manager = ConfigManager
