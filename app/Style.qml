@@ -1,10 +1,13 @@
+import QtQuick 2.15
+
 QtObject{
-    id: style
-    property int pointSize: 10
-    property int layoutMargins: 10
-    property int spacing: 8
-    property int dirInputWidth: 200
-    property int normInputWidth: 80
-    property int spinBoxWidth: 120
-    property int spinBoxHeight: 30
+    property int textPointSize: 11
+    property int titlePointSize: 16
+    property int layoutMargins: 50
+    property int horizontalSpacing: 10
+    property int longerInputWidth: 200
+    property int normalInputWidth: 80
+    property int boxWidth: 120
+    property int boxHeight: 30
+    property int checkBoxHeight: 30
 }

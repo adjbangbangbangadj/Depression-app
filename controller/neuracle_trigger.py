@@ -3,22 +3,24 @@ from PySide6.QtCore import QObject, Slot
 import logging
 
 
+_trigger_box = None
+
 class NeuracleTrigger(QObject):
-    _trigger_box = None
 
     @Slot(result='bool')
     def init(self):
-        if not NeuracleTrigger._trigger_box:
+        global _trigger_box
+        if not _trigger_box:
             try:
-                NeuracleTrigger._trigger_box = TriggerBox("COM4")
+                _trigger_box = TriggerBox("COM4")
             except:
                 raise RuntimeError(
                     'Cannot init the Neuracle trigger box. may cause by the disconnection to the Neuracle')
 
     @Slot(str)
     def mark(self, value: str) -> None:
-        if NeuracleTrigger._trigger_box:
-            NeuracleTrigger._trigger_box.output_event_data(value)
+        if _trigger_box:
+            _trigger_box.output_event_data(value)
         else:
             logging.warning(
                 'Cannot not send event data to Neuracle device. NeuracleTrigger not initialized!')

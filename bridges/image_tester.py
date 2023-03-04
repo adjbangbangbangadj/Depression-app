@@ -7,27 +7,28 @@ import vars
 class ImageTester(QObject):
     def __init__(self):
         super().__init__()
-        self.conf = vars.conf['image_test']
-        self.image_nums = [int(self.conf[f]) for f in ["pos_image_num", "neu_image_num", "neg_image_num"]]
+        self.conf = lambda x: vars.config.get('image_test', x)
+        self.image_nums = [int(self.conf(f)) for f in ["pos_image_num", "neu_image_num", "neg_image_num"]]
 
         # 构建并保存图片(根据设置选择图片源)
         self.image_infos:list[dict] = None
-        if self.conf['dataset'] == 'K': # TODO
-            self.image_infos = read_images(*self.image_nums, if_allowed_images_dup=self.conf["if_allowed_images_dup"])
-        elif self.conf['dataset'] == 'C': # TODO
+        if self.conf('image_dataset') == 'KDEF':
+            self.image_infos = read_images(*self.image_nums, if_allowed_images_dup=self.conf("if_allowed_images_dup"))
+        elif self.conf('image_dataset') == 'CAPS':
             self.image_infos = read_images(*self.image_nums, build_images_consider_gender(
-                *self.image_nums(), if_allowed_images_dup=self.conf["if_allowed_images_dup"],
-                if_same_neu_image_for_background=self.conf["if_same_neu_image_for_background"],
-                if_same_neu_image_for_neu=self.conf["if_same_neu_image_for_neu"]))
+                *self.image_nums, if_allowed_images_dup=self.conf("if_allowed_images_dup"),
+                if_same_neu_image_for_background=self.conf("if_same_neu_image_for_background"),
+                if_same_neu_image_for_neu=self.conf("if_same_neu_image_for_neu")))
         # 构建并保存背景
         self.interval_background = build_background_image(
-            *(lambda x: [x.size(), x.format()])(self.get_image(0)), self.conf["background_color"])
-
-        vars.image_provider.set_image(,)
+            *(lambda x: [x.size(), x.format()])(self.get_image(0)), self.conf("background_color"))
+        # push image to ImageProvider
+        for index, item in enumerate(self.image_infos):
+            vars.image_provider.set_image(index, item['image'])
 
 
     @Slot(int, str, int)
-    def user_answer(self, image_index, user_tag, duration):
+    def answer(self, image_index, user_tag, duration):
         image = self.image_infos[image_index]
         image['user_tag'] = user_tag
         image['duration'] = duration

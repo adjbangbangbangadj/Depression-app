@@ -1,5 +1,5 @@
-import QtQuick 2.14
-import QtQuick.Window 2.14
+import QtQuick 2.15
+import QtQuick.Window 2.15
 import QtQuick.Layouts 2.15
 
 Window {
@@ -12,18 +12,39 @@ Window {
     minimumWidth: 640
     minimumHeight: 480
 
-    StackLayout {
-        id: root_layout
-        anchors.fill: parent
+    function setCurrentPage(name){
+        pages = {'home':'HomePage.qml',
+        'option':'OptionPage.qml',
+        'settings':'SettingsPage.qml',
+        'image_test':'ImageTestPage.qml',
+        'audio_test':'AudioTestPage.qml'}
+        page_loader.source = page[name]
 
-        function setCurrentPage(value){
-            currentIndex = ['home','option','settings','image_test','audio_test'].indexOf(value)
-        }
-
-        HomePage {}
-        OptionPage {}
-        SettingsPage {}
-        ImageTestPage {}
-        AudioTestPage {}
     }
+
+    Loader {
+        id: page_loader
+        // active: true
+        source: 'HomePage.qml'
+        // sourceComponent: AboutWindow{
+            // id: settings_window
+            // visible: true
+            // onClosing: Loader.active = false
+        // }
+    }
+
+    // StackLayout {
+    //     id: root_layout
+    //     anchors.fill: parent
+
+    //     function setCurrentPage(value){
+    //         currentIndex = ['home','option','settings','image_test','audio_test'].indexOf(value)
+    //     }
+
+    //     HomePage {}
+    //     OptionPage {}
+    //     SettingsPage {}
+    //     ImageTestPage {}
+    //     AudioTestPage {}
+    // }
 }

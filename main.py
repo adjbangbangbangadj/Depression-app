@@ -5,6 +5,7 @@ from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from pathlib import Path
 import sys
 
+import conf
 import vars
 from bridges.image_tester import ImageTester
 from bridges.audio_tester import AudioTester
@@ -16,13 +17,14 @@ from controller.neuracle_trigger import NeuracleTrigger
 if __name__ == "__main__":
     file_utils = FileUtils()
     neuracle_trigger = NeuracleTrigger()
+    vars.config = conf.ConfigManager()
 
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
-    qmlRegisterType(ImageTester, 'main', 1, 0, 'ImageTester')
-    qmlRegisterType(AudioTester, 'main', 1, 0, 'AudioTester')
-    qmlRegisterType(MainTester, 'main', 1, 0, 'MainTester')
+    qmlRegisterType(ImageTester, 'Main', 1, 0, 'ImageTester')
+    qmlRegisterType(AudioTester, 'Main', 1, 0, 'AudioTester')
+    qmlRegisterType(MainTester, 'Main', 1, 0, 'MainTester')
 
     context = engine.rootContext()
     context.setContextProperty("$file_utils", file_utils)

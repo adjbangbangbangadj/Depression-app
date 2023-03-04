@@ -1,41 +1,28 @@
-import QtQuick 2.14
-import QtQuick.Window 2.14
+import QtQuick 2.15
+import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick.Layouts 2.15
 
+import 'control'
 
 Page{
+    Style{id: settings_style}
+    property bool need_combine_image : true
     QtObject{
-        id: style
-        property int pointSize: 10
-        property int layoutMargins: 10
-        property int spacing: 8
-        property int dirInputWidth: 200
-        property int normInputWidth: 80
-        property int spinBoxWidth: 120
-        property int spinBoxHeight: 30
-    }
-    QtObject{
-        id: attrs
-        property var comps_need_updated: []
-        property bool need_image_combine : true
-        property var configs: {}
-        property var default_configs:
-        {
-            "image_dataset":"Default",
-            "if_use_api":true,
-            "pos_image_num": 7,
-            "neu_image_num": 6,
-            "neg_image_num": 7,
-            "if_same_neu_image_for_neu":true,
-            "if_same_neu_image_for_background":true,
-            "if_allowed_images_dup":false,
-            "answer_duration": 4000,
-            "interval_duration": 3000,
-            "if_end_immediately_after_answer": true,
-            "background_color": "black",
-            "if_background_fill": false,
-        }
+        id: configs
+        property string image_dataset: "CAPS"
+        property int pos_image_num: 7
+        property int neu_image_num: 6
+        property int neg_image_num: 7
+        property bool if_same_neu_image_for_neu:true
+        property bool if_same_neu_image_for_background:true
+        property bool if_allowed_images_dup:false
+        property double answer_duration: 4.0
+        property double interval_duration: 3.0
+        property bool if_end_immediately_after_answer: true
+        property string background_color: "black"
+        property bool if_background_fill_view: false
+
     }
 
     property var confine:
@@ -45,246 +32,226 @@ Page{
         "neg":70
     }
 
-    function init(){
-        console.log($config.get_configs())
-        // attrs.configs = JSON.parse($config.get_configs())
-        reset_configs_to_default()
-        console.log(comps_need_updated)
-        update()
-    }
-
     function reset_configs_to_default(){
         attrs.configs = Object.assign({}, attrs.default_configs)
         update()
     }
 
-    function update(){
-        for(var i of attrs.comps_need_updated)
-            i.update()
-    }
-
-    function save_config(){
-        $config.end_edit(JSON.stringify(attrs.configs))
-    }
+    // function save_config(){
+    //     $configs.end_edit(JSON.stringify(attrs.configs))
+    // }
 
 
-        // anchors.fill: parent
-        // anchors.margins: style.layoutMargins
-    header: TabBar {
-        id: tabBar
-        width: parent.width
-        TabButton {
-            text: qsTr("图片测试")
-            font.pointSize: style.pointSize
+    header: RowLayout {
+        TabBar {
+            id: tabBar
+            // width: parent.width
+            TabButton {
+                text: qsTr("图片测试设置")
+                font.pointSize: settings_style.textPointSize
+            }
+            TabButton {
+                text: qsTr("语音测试设置")
+                font.pointSize: settings_style.textPointSize
+            }
         }
-        TabButton {
-            text: qsTr("语音测试")
-            font.pointSize: style.pointSize
-        }
+        Item {}
     }
 
     StackLayout {
-        width: parent.width
+        // anchors.top: parent.top
+        // anchors.topMargin: 20
+        anchors.fill: parent
+        anchors.margins: settings_style.layoutMargins
         clip: true
         currentIndex: tabBar.currentIndex
         GridLayout {
             columns:2
-            // Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            anchors.margins: 100
+            columnSpacing: settings_style.horizontalSpacing
             Text {
-                text: qsTr("图片数据集：")
-                font.pointSize: style.pointSize
+                text: qsTr("图片数据集")
+                font.pointSize: settings_style.textPointSize
             }
             ComboBox {
                 id: comboBox_dataset
                 textRole: "text"
                 valueRole: "value"
-                Component.onCompleted: attrs.comps_need_updated.push(comboBox_dataset)
-                onActivated: {
-                    attrs.configs["image_dataset"] = currentValue
-                    change_relevant_components_visible()
-                }
+                font.pointSize: settings_style.textPointSize
+                implicitHeight: settings_style.boxHeight
                 model: [
-                    { value: "Default", text: qsTr("Default") },
-                    { value: "KDEF&AKDEF", text: qsTr("KDEF&AKDEF") },
+                    { value: "CAPS", text: qsTr("Chinese Affective Picture System") },
+                    { value: "KDEF", text: qsTr("The Karolinska Directed Emotional Faces") },
                 ]
-                function update(){
-                    currentIndex = indexOfValue(attrs.configs["image_dataset"])
-                    change_relevant_components_visible()
-                }
                 function change_relevant_components_visible(){
-                    attrs.need_image_combine = currentValue == "KDEF&AKDEF"? false:true
+                    attrs.need_image_combine = currentValue == "KDEF"? false:true
                 }
             }
 
+            // Text {
+            //     id: prompt_total_num
+            //     font.pointSize: settings_style.textPointSize
+            //     Component.onCompleted: attrs.comps_need_updated.push(prompt_total_num)
+            //     function update(){
+            //         attrs.configs["turn_num"] = attrs.configs["pos_image_num"]+attrs.configs["neu_image_num"]+attrs.configs["neg_image_num"]
+            //         prompt_total_num.text = qsTr(`总图片数${attrs.configs["turn_num"] }`)
+            //     }
+            // }
+            // Item {}
             Text {
-                id: prompt_total_num
-                font.pointSize: style.pointSize
-                Component.onCompleted: attrs.comps_need_updated.push(prompt_total_num)
-                function update(){
-                    attrs.configs["turn_num"] = attrs.configs["pos_image_num"]+attrs.configs["neu_image_num"]+attrs.configs["neg_image_num"]
-                    prompt_total_num.text = qsTr(`总图片数：${attrs.configs["turn_num"] }`)
-                }
-            }
-            Item {}
-            Text {
-                text: qsTr("积极图片数：")
-                font.pointSize: style.pointSize
+                text: qsTr("积极图片数")
+                font.pointSize: settings_style.textPointSize
             }
             SpinBox{
                 id: spinBox_pos_num
-
-                font.pointSize: style.pointSize
-                implicitWidth: style.spinBoxWidth
-                implicitHeight: style.spinBoxHeight
-                Component.onCompleted: attrs.comps_need_updated.push(spinBox_pos_num)
+                font.pointSize: settings_style.textPointSize
+                implicitWidth: settings_style.boxWidth
+                implicitHeight: settings_style.boxHeight
                 editable:true
                 from:0; to:confine["pos"]
-                onValueModified:{ attrs.configs["pos_image_num"] = parseInt(value); prompt_total_num.update()}
-                function update(){value = attrs.configs["pos_image_num"]}
+                value: configs.pos_image_num
             }
             Text {
-                text: qsTr("中性图片数：")
-                font.pointSize: style.pointSize
+                text: qsTr("中性图片数")
+                font.pointSize: settings_style.textPointSize
             }
             SpinBox{
                 id: spinBox_neu_num
-                font.pointSize: style.pointSize
-                implicitWidth: style.spinBoxWidth
-                implicitHeight: style.spinBoxHeight
-                Component.onCompleted: attrs.comps_need_updated.push(spinBox_neu_num)
+                font.pointSize: settings_style.textPointSize
+                implicitWidth: settings_style.boxWidth
+                implicitHeight: settings_style.boxHeight
                 editable:true
                 from:0; to:confine["neu"]
-                onValueModified:{ attrs.configs["neu_image_num"] = parseInt(value); prompt_total_num.update()}
-                function update(){value = attrs.configs["neu_image_num"]}
+                value: configs.neu_image_num
             }
             Text {
-                text: qsTr("消极图片数：")
-                font.pointSize: style.pointSize
+                text: qsTr("消极图片数")
+                font.pointSize: settings_style.textPointSize
             }
             SpinBox{
                 id: spinBox_neg_num
-                font.pointSize: style.pointSize
-                implicitWidth: style.spinBoxWidth
-                implicitHeight: style.spinBoxHeight
-                Component.onCompleted: attrs.comps_need_updated.push(spinBox_neg_num)
+                font.pointSize: settings_style.textPointSize
+                implicitWidth: settings_style.boxWidth
+                implicitHeight: settings_style.boxHeight
                 editable:true
                 from:0; to:confine["neg"]
-                onValueModified:{ attrs.configs["neg_image_num"] = parseInt(value); prompt_total_num.update()}
-                function update(){value = attrs.configs["neg_image_num"]}
+                value: configs.neg_image_num
             }
             Text {
-                text: qsTr("在测试图片中是否使用相同的三张中性图片")
-                font.pointSize: style.pointSize
+                text: qsTr("在组合图片时使用相同的三张中性图片")
+                font.pointSize: settings_style.textPointSize
             }
             CheckBox {
                 id: checkBox_if_same_neu_image_for_background
-                visible: attrs.need_image_combine
-                font.pointSize: style.pointSize
-                Component.onCompleted: attrs.comps_need_updated.push(checkBox_if_same_neu_image_for_background)
-                onCheckedChanged: attrs.configs["if_same_neu_image_for_background"] = checked
-                function update(){checked = attrs.configs["if_same_neu_image_for_background"]}
+                visible: need_combine_image
+                font.pointSize: settings_style.textPointSize
+                implicitHeight: settings_style.checkBoxHeight
+                checked: configs.if_same_neu_image_for_background
             }
             Text {
-                text: qsTr("在中性测试图片中是否使用相同的四张中性图片")
-                font.pointSize: style.pointSize
+                text: qsTr("在组合中性测试图片时使用相同的四张中性图片")
+                font.pointSize: settings_style.textPointSize
             }
             CheckBox {
                 id: checkBox_if_same_neu_image_for_neu
-                visible: attrs.need_image_combine
-                font.pointSize: style.pointSize
-                Component.onCompleted: attrs.comps_need_updated.push(checkBox_if_same_neu_image_for_neu)
-                onCheckedChanged: attrs.configs["if_same_neu_image_for_neu"] = checked
-                function update(){checked = attrs.configs["if_same_neu_image_for_neu"]}
+                visible: need_combine_image
+                font.pointSize: settings_style.textPointSize
+                implicitHeight: settings_style.checkBoxHeight
+                checked: configs.if_same_neu_image_for_neu
             }
             Text {
-                text: qsTr("是否允许图片重复")
-                font.pointSize: style.pointSize
+                text: qsTr("允许图片重复")
+                font.pointSize: settings_style.textPointSize
             }
             CheckBox {
                 id: checkBox_if_allowed_images_dup
-                font.pointSize: style.pointSize
-                Component.onCompleted: attrs.comps_need_updated.push(checkBox_if_allowed_images_dup)
-                onCheckedChanged: attrs.configs["if_allowed_images_dup"] = checked
-                function update(){checked = attrs.configs["if_allowed_images_dup"]}
+                font.pointSize: settings_style.textPointSize
+                implicitHeight: settings_style.checkBoxHeight
+                checked: configs.if_allowed_images_dup
             }
             Text {
-                text: qsTr("每张图片作答时长（单位：秒）：")
-                font.pointSize: style.pointSize
+                text: qsTr("每张图片作答时长（单位秒）")
+                font.pointSize: settings_style.textPointSize
             }
-            PromptTextInput{
+            DoubleSpinBox{
                 id: input_answer_duration
-                pointSize: style.pointSize
-                inputWidth: style.normInputWidth
-                Component.onCompleted: attrs.comps_need_updated.push(input_answer_duration)
-                textInput.validator: DoubleValidator{bottom:0}
-                textInput.onEditingFinished: attrs.configs["answer_duration"] = parseFloat(textInput.text) *1000
-                function update(){textInput.text = attrs.configs["answer_duration"] /1000}
+                implicitWidth: settings_style.boxWidth
+                implicitHeight: settings_style.boxHeight
+                font.pointSize: settings_style.textPointSize
+                doubleValue: configs.answer_duration
             }
             Text {
-                text: qsTr("两张图片间隔时长（单位：秒）：")
-                font.pointSize: style.pointSize
+                text: qsTr("两张图片间隔时长（单位秒）")
+                font.pointSize: settings_style.textPointSize
             }
-            PromptTextInput{
+            DoubleSpinBox{
                 id: input_interval_duration
-                pointSize: style.pointSize
-                inputWidth: style.normInputWidth
-                Component.onCompleted: attrs.comps_need_updated.push(input_interval_duration)
-                textInput.validator: DoubleValidator{bottom:0}
-                textInput.onEditingFinished: attrs.configs["interval_duration"] = parseFloat(textInput.text) *1000
-                function update(){textInput.text = attrs.configs["interval_duration"] /1000}
+                implicitWidth: settings_style.boxWidth
+                implicitHeight: settings_style.boxHeight
+                font.pointSize: settings_style.textPointSize
+                doubleValue: configs.interval_duration
             }
             Text {
-                text: qsTr("是否在图片作答后立刻结束对该图片的作答")
-                font.pointSize: style.pointSize
+                text: qsTr("在图片作答后立刻结束对该图片的作答")
+                font.pointSize: settings_style.textPointSize
             }
             CheckBox {
                 id: checkBox_if_end_immediately
-                font.pointSize: style.pointSize
-                text: qsTr("是否在图片作答后立刻结束对该图片的作答")
-                Component.onCompleted: attrs.comps_need_updated.push(checkBox_if_end_immediately)
-                onCheckedChanged: attrs.configs.if_end_immediately_after_answer = checked
-                function update(){checked = attrs.configs["if_end_immediately_after_answer"]}
+                font.pointSize: settings_style.textPointSize
+                implicitHeight: settings_style.checkBoxHeight
+                checked:configs.if_end_immediately_after_answer
             }
-            Text {
-                text: qsTr("背景颜色")
-                font.pointSize: style.pointSize
-            }
-            PromptTextInput{
-                id: input_background_color
-                pointSize: style.pointSize
-                inputWidth: style.normInputWidth
-                Component.onCompleted: attrs.comps_need_updated.push(input_background_color)
-                textPrompt.text: qsTr("")
-                textInput.onEditingFinished:  attrs.configs["background_color"] = textInput.text
-                function update(){textInput.text = attrs.configs["background_color"]}
-            }
-
-            // CheckBox {
-            //     id: checkBox_if_use_api
-            //     font.pointSize: style.pointSize
-            //     text: qsTr("是否向neuracleAPI发送信号")
-            //     Component.onCompleted: attrs.comps_need_updated.push(checkBox_if_use_api)
-            //     onCheckedChanged: attrs.configs["if_use_api"] = checked
-            //     function update(){checked = attrs.configs["if_use_api"]}
+            // Text {
+            //     text: qsTr("背景颜色")
+            //     font.pointSize: settings_style.textPointSize
+            // }
+            // PromptTextInput{
+            //     id: input_background_color
+            //     pointSize: settings_style.textPointSize
+            //     inputWidth: settings_style.normalInputWidth
+            //     Component.onCompleted: attrs.comps_need_updated.push(input_background_color)
+            //     textPrompt.text: qsTr("")
+            //     textInput.onEditingFinished:  attrs.configs["background_color"] = textInput.text
+            //     function update(){textInput.text = attrs.configs["background_color"]}
             // }
         }
 
-        ColumnLayout{
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            spacing: style.spacing
+        GridLayout {
+            columns:2
+            columnSpacing: settings_style.horizontalSpacing
+
+            Text {
+                text: qsTr("题目顺序随机")
+                font.pointSize: settings_style.textPointSize
+            }
         }
+
     }
     footer: RowLayout{
         Layout.alignment: Qt.AlignRight
+        Item {
+            Layout.fillWidth: true
+        }
+        Button {
+            id: button_reset
+            font.pointSize: settings_style.textPointSize
+            text: qsTr("恢复默认值")
+            onClicked: {
+                console.log('t')
+                for (var prop in configs) {
+                    print(prop += " (" + typeof(configs[prop]) + ") = " + configs[prop]);
+                }
+            }
+        }
         Button {
             id: button_cancel
-            font.pointSize: style.pointSize
+            font.pointSize: settings_style.textPointSize
             text: qsTr("取消")
             onClicked: root_layout.setCurrentPage('home')
         }
         Button {
             id: button_save
-            font.pointSize: style.pointSize
+            font.pointSize: settings_style.textPointSize
             text: qsTr("确定")
             onClicked: {save_config(); root_layout.setCurrentPage('home')}
         }

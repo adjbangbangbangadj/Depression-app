@@ -1,6 +1,6 @@
-import QtQuick 2.14
+import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick.Layouts 2.15
 
 RowLayout{
     property alias textInput: input
@@ -20,12 +20,9 @@ RowLayout{
         clip: true
         TextInput{
             id: input
-            selectByMouse: true
-            anchors.fill: parent
-            anchors.leftMargin: 6
+            anchors.centerIn: parent
+            width: parent.width * 0.9
             font.pointSize: pointSize
-            verticalAlignment: TextInput.AlignVCenter
-
         }
     }
 }

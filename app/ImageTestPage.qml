@@ -1,6 +1,8 @@
-import QtQuick 2.14
+import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick.Layouts 2.15
+
+import Main
 
 RowLayout {
     signal testEnd
@@ -23,6 +25,12 @@ RowLayout {
                 fillMode:attrs.if_background_fill?Image.Stretch :Image.PreserveAspectFit}
         }
     ]
+
+    ImageTester{
+        id: image_tester
+
+    }
+
     QtObject{
         id: attrs
         property string image_source: "image://test/0"
@@ -123,8 +131,7 @@ RowLayout {
         function button_press(button,tag){
             if (buttons.is_marked != true){
                 button.down = true
-                $test.mark(attrs.current_turn_index-1,tag,
-                           curr_time()-attrs.curr_turn_begin_time)
+                image_tester.answer(attrs.current_turn_index-1, tag, curr_time()-attrs.curr_turn_begin_time)
                 buttons.is_marked = true
             }
         }

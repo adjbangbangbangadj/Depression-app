@@ -3,27 +3,10 @@ from PySide6.QtQuick import QQuickImageProvider
 from pathlib import Path
 import sys
 import logging
-import conf
 import traceback
 
 from collections import namedtuple
 from datetime import datetime, date
-
-
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s')
-file_logger = logging.FileHandler(vars.log_path)
-file_logger.setFormatter(formatter)
-file_logger.setLevel(logging.INFO)
-logger.addHandler(file_logger)
-
-def excepthook(exc_type, exc_value, exc_traceback):
-    logging.error("".join(traceback.format_exception(exc_type, exc_value, exc_traceback)))
-sys.excepthook = excepthook
-
-
-
 
 executable_path = Path(sys.argv[0]).parent
 data_dir = executable_path / Path('data')
@@ -31,27 +14,38 @@ logs_dir = executable_path / Path('logs')
 configs_dir = executable_path / Path('conf')
 results_dir = executable_path / Path('results')
 
-log_path = logs_dir / Path( date.today().strftime("%Y-%m") + '.log')
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s')
+file_logger = logging.FileHandler(logs_dir / Path(date.today().strftime("%Y-%m") + '.log'))
+file_logger.setFormatter(formatter)
+file_logger.setLevel(logging.INFO)
+logger.addHandler(file_logger)
+console_logger = logging.StreamHandler()
+console_logger.setFormatter(formatter)
+console_logger.setLevel(logging.DEBUG)
+logger.addHandler(console_logger)
 
-# if not results_dir.is_dir():
-#     try:
-#         results_dir.mkdir()
-#     except OSError:
-#         logging.error('can not create ./results dir')
-#         raise
+def excepthook(exc_type, exc_value, exc_traceback):
+    logging.error("".join(traceback.format_exception(exc_type, exc_value, exc_traceback)))
+sys.excepthook = excepthook
+
+def check_dir(path:Path, raise_if_nonexsit:bool = False):
+    if not path.is_dir():
+        if raise_if_nonexsit:
+            raise OSError(f'can not find {path} directory')
+        else:
+            try:
+                results_dir.mkdir()
+            except OSError:
+                logging.error(f'can not create {path} directory')
+                raise
+
+for d in [data_dir, logs_dir, configs_dir, results_dir]:
+    check_dir(d)
 
 
-
-
-config = conf.ConfigManager()
-try:
-    config_file = open('config.ini','r')
-    # config.read_file(config_file)
-except Exception as e:
-    logging.warning('Could not read config.ini file!')
-
-
-
+config = None
 test_info = None
 
 def TestInfo(username, begin_time = None):
