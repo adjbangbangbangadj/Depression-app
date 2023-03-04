@@ -1,4 +1,4 @@
-from utils.neuracle_utils import TriggerBox
+from utils.neuracle_lib import TriggerBox
 from PySide6.QtCore import QObject, Slot
 import logging
 

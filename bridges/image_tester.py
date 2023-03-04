@@ -1,33 +1,17 @@
 from PySide6.QtCore import QObject, Slot
 from csv import DictWriter
 from pathlib import Path
+from utils.image_utils import build_images_consider_gender, read_images, build_background_image
 import vars
-from .utils.image_utils import build_images_consider_gender, read_images, build_background_image
 
-class ImageTestBridge(QObject):
+class ImageTester(QObject):
     def __init__(self):
+        super().__init__()
         self.conf = vars.conf['image_test']
-        self.image_infos:list[dict] = []
-        self.interval_background = ...
         self.image_nums = [int(self.conf[f]) for f in ["pos_image_num", "neu_image_num", "neg_image_num"]]
 
-    @Slot(int, str, int)
-    def user_answer(self, image_index, user_tag, duration):
-        image = self.image_infos[image_index]
-        image['user_tag'] = user_tag
-        image['duration'] = duration
-        # if self.conf["if_use_api"]:
-        #     mark(1)
-
-    # # 每轮图片开始的时候进行打标
-    # @Slot()
-    # def turn_start(self):
-    #     if self.conf["if_use_api"]:
-    #         mark(0)
-
-    @Slot(str)
-    def image_init(self):
         # 构建并保存图片(根据设置选择图片源)
+        self.image_infos:list[dict] = None
         if self.conf['dataset'] == 'K': # TODO
             self.image_infos = read_images(*self.image_nums, if_allowed_images_dup=self.conf["if_allowed_images_dup"])
         elif self.conf['dataset'] == 'C': # TODO
@@ -39,19 +23,15 @@ class ImageTestBridge(QObject):
         self.interval_background = build_background_image(
             *(lambda x: [x.size(), x.format()])(self.get_image(0)), self.conf["background_color"])
 
-        # 调用api
-        # if self.conf["if_use_api"]:
-        #     start()
+        vars.image_provider.set_image(,)
 
-        # captureVideoFromCamera()
 
-        # video_source = 0  # 0 for webcam, or path to video file
-        # output_file = 'output.avi'
-        # capture_thread = VideoCaptureThread(video_source, output_file)
-        # capture_thread.setDaemon(True)
-        # capture_thread.start()
+    @Slot(int, str, int)
+    def user_answer(self, image_index, user_tag, duration):
+        image = self.image_infos[image_index]
+        image['user_tag'] = user_tag
+        image['duration'] = duration
 
-    # 测试结束时触发此函数，调用服务将结果写入磁盘
     @Slot()
     def save_image_test_result(self):
         test_result = []

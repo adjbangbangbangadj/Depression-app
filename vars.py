@@ -4,8 +4,25 @@ from pathlib import Path
 import sys
 import logging
 import conf
+import traceback
+
 from collections import namedtuple
-from datetime import datetime
+from datetime import datetime, date
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s')
+file_logger = logging.FileHandler(vars.log_path)
+file_logger.setFormatter(formatter)
+file_logger.setLevel(logging.INFO)
+logger.addHandler(file_logger)
+
+def excepthook(exc_type, exc_value, exc_traceback):
+    logging.error("".join(traceback.format_exception(exc_type, exc_value, exc_traceback)))
+sys.excepthook = excepthook
+
+
 
 
 executable_path = Path(sys.argv[0]).parent
@@ -14,6 +31,7 @@ logs_dir = executable_path / Path('logs')
 configs_dir = executable_path / Path('conf')
 results_dir = executable_path / Path('results')
 
+log_path = logs_dir / Path( date.today().strftime("%Y-%m") + '.log')
 
 # if not results_dir.is_dir():
 #     try:
@@ -25,7 +43,7 @@ results_dir = executable_path / Path('results')
 
 
 
-config = conf.conf_manager
+config = conf.ConfigManager()
 try:
     config_file = open('config.ini','r')
     # config.read_file(config_file)
@@ -34,7 +52,7 @@ except Exception as e:
 
 
 
-test_info = ...
+test_info = None
 
 def TestInfo(username, begin_time = None):
     begin_time = begin_time or datetime.now()
@@ -57,5 +75,8 @@ class ImageProvider(QQuickImageProvider):
         # if id == "background":
             # return vars.interval_background
         # return vars.get_pic(int(id))
+
+    def set_image(self, name, value):
+        self.image[name] = value
 
 image_provider = ImageProvider()

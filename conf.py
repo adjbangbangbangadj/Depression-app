@@ -8,10 +8,11 @@ import logging
 
 class ConfigManager(QObject):
     def __init__(self):
+        super().__init__()
         self.config:ConfigParser = ConfigParser()
 
         self.config.read_file
-        self.current_config_set = ...
+        # self.current_config_set = ...
         self.config_sets: dict[str,Path] = ...
 
 
@@ -32,21 +33,13 @@ class ConfigManager(QObject):
     def _load_config_sets(self):
         ...
 
-    @Slot(result="QString")
-    def get_config_sets(self):
-        return list(self.config_sets.keys())
 
-    @Slot(str)
-    def delete_config_set(self, deleted:str) -> None:
-        self.config_sets.index(deleted)
-        try:
-            ...
-        except:
-            ...
-
-    @Slot(str)
-    def create_config_set(self) -> None:
-        # create
+    @Slot()
+    def import_configs(self) -> None:
         ...
 
-conf_manager = ConfigManager
+    @Slot()
+    def import_configs(self) -> None:
+        ...
+
+

@@ -3,10 +3,14 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 ColumnLayout {
-
     id: button_option
+
+    // onVisibleChanged:{
+    //     if (visible==true)
+    //         ...
+    // }
+
     spacing: 80
-    property bool buttons_enabled: true
     property int buttonHeight: 50
     property int buttonWidth: 150
     property int buttonTextSize: 14
@@ -36,6 +40,7 @@ ColumnLayout {
         Layout.minimumHeight: button_option.buttonHeight
         Layout.minimumWidth: button_option.buttonHeight
         onClicked: root_layout.setCurrentPage('image_test')
+
     }
     Button{
         id: button_record_test

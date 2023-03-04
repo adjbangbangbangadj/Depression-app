@@ -1,0 +1,6 @@
+# Function dependencies, for example:
+# package>=version
+pyserial
+python-opencv
+pyside6
+pyaudio

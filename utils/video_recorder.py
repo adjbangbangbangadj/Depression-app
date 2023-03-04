@@ -1,12 +1,13 @@
 import cv2
 import threading
 
-class VideoRecorder(threading.Thread):
-    def __init__(self, video_source, output_file):
-        super().__init__(self)
+class VideoCaptureThread(threading.Thread):
+    def __init__(self, output_file, video_source = 0):
+        super().__init__()
+        self.setDaemon(True)
         self.flag = True
-        self.video_source = video_source
         self.output_file = output_file
+        self.video_source = video_source
         self.capture = cv2.VideoCapture(self.video_source)
         self.fps = int(self.capture.get(cv2.CAP_PROP_FPS))
         self.width = int(self.capture.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -27,3 +28,5 @@ class VideoRecorder(threading.Thread):
 
     def end(self):
         self.flag = False
+
+

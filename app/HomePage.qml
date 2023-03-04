@@ -15,15 +15,25 @@ Page{
             title: qsTr("设置")
             Action { text: qsTr("设置"); onTriggered: root_layout.setCurrentPage('settings')}
             MenuSeparator {}
-            Action { text: qsTr("导出设置") }
-            Action { text: qsTr("载入设置") }
+            Action { text: qsTr("导出设置"); onTriggered:$config.export_configs()}
+            Action { text: qsTr("载入设置"); onTriggered:$config.import_configs()}
         }
         Menu {
             title: qsTr("关于")
-            Action { text: qsTr("关于") }
+            Action { text: qsTr("关于"); onTriggered: aboutwindow_loader.active = true}
         }
     }
 
+
+    Loader {
+        id: aboutwindow_loader
+        active: false
+        sourceComponent: AboutWindow{
+            id: settings_window
+            visible: true
+            onClosing: aboutwindow_loader.active = false
+        }
+    }
 
     ColumnLayout{
         id: start_view
@@ -41,17 +51,19 @@ Page{
             Layout.preferredHeight: 40
             font.pointSize: 14
             Layout.alignment: Qt.AlignHCenter
-            onClicked: root_layout.setCurrentPage('option')
+            onClicked: {
+                root_layout.setCurrentPage('option')
+                $test_manager.test_start(name_input.text)
+            }
         }
 
         PromptTextInput{
-            id: name_layout
+            id: name_input
             Layout.alignment: Qt.AlignHCenter
             pointSize: 14
             inputHeight: 34
             inputWidth: 120
             textPrompt.text: qsTr("姓名：")
-            // textInput.text: username
         }
     }
 }

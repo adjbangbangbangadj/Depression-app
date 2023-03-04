@@ -1,5 +1,9 @@
 /.idea
 /data
 /venv
+/logs
+/conf
+/results
+/out
 *.pyc
 *.pyi
