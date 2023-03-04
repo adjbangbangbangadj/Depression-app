@@ -380,18 +380,3 @@ class TriggerBox(object):
 
     def closeSerial(self):
         self._device_comport_handle.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

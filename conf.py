@@ -49,10 +49,4 @@ class ConfigManager(QObject):
         # create
         ...
 
-    @Slot(str)
-    def rename_config_set(self) -> None:
-        #
-
-        ...
-
 conf_manager = ConfigManager

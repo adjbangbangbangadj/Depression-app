@@ -1,5 +1,4 @@
 from PySide6.QtCore import QObject, Slot
-from PySide6.QtQml import QmlElement
 # from pathlib import Path
 # import vars
 import pyaudio

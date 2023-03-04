@@ -1,11 +1,9 @@
 from PySide6.QtCore import QObject, Slot
-from PySide6.QtQml import QmlElement
 from csv import DictWriter
 from pathlib import Path
 import vars
-from ..service.image_utils import build_images_consider_gender, read_images, build_background_image
+from .utils.image_utils import build_images_consider_gender, read_images, build_background_image
 
-@QmlElement
 class ImageTestBridge(QObject):
     def __init__(self):
         self.conf = vars.conf['image_test']

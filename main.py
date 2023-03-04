@@ -1,15 +1,16 @@
 # This Python file uses the following encoding: utf-8
 
 from PySide6.QtGui import QGuiApplication
-from PySide6.QtQml import QQmlApplicationEngine
+from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 
-import argparse
-# import configparser
 import logging
 import sys
 from pathlib import Path
 
 import vars
+from controller.file_utils import FileUtils
+from controller.neuracle_trigger import NeuracleTrigger
+
 
 if __name__ == "__main__":
     # logging
@@ -22,19 +23,20 @@ if __name__ == "__main__":
     # logger.addHandler(console_handler)
     # logger.addHandler(file_handler)
 
-    # argparse
-    parser = argparse.ArgumentParser()
-    args = parser.parse_args()
-
+    # qmlRegisterType(NumberGenerator, 'Generators', 1, 0, 'NumberGenerator')
 
     # qtquick start
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
-    context = engine.rootContext()
+
     # context.setContextProperty("$test", controller.test_controller)
-    context.setContextProperty("$config", vars.config)
-    engine.addImageProvider("test", vars.image_provider)
-    engine.load(str(vars.executable_path / Path("qml/main.qml")))
+    context = engine.rootContext()
+    context.setContextProperty("$file_utils", FileUtils)
+    context.setContextProperty("$neuracle_trigger", NeuracleTrigger)
+    # context.setContextProperty("$", vars.config)
+    # context.setContextProperty("$", vars.config)
+    engine.addImageProvider("root", vars.image_provider)
+    engine.load(str(vars.executable_path / Path("app/main.qml")))
 
     if not engine.rootObjects():
         sys.exit(-1)

@@ -9,18 +9,20 @@ from datetime import datetime
 
 
 executable_path = Path(sys.argv[0]).parent
-result_parent_dir = executable_path / Path('result')
+data_dir = executable_path / Path('data')
+logs_dir = executable_path / Path('logs')
+configs_dir = executable_path / Path('conf')
+results_dir = executable_path / Path('results')
 
 
-if not result_parent_dir.is_dir():
-    try:
-        result_parent_dir.mkdir()
-    except OSError:
-        logging.error('can not create ./result dir')
-        raise
+# if not results_dir.is_dir():
+#     try:
+#         results_dir.mkdir()
+#     except OSError:
+#         logging.error('can not create ./results dir')
+#         raise
 
 
-config_dir = executable_path / Path('config.ini')
 
 
 config = conf.conf_manager
@@ -29,7 +31,7 @@ try:
     # config.read_file(config_file)
 except Exception as e:
     logging.warning('Could not read config.ini file!')
-    raise
+
 
 
 test_info = ...
