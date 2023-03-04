@@ -39,7 +39,7 @@ ColumnLayout {
         font.pointSize: button_option.buttonTextSize
         Layout.minimumHeight: button_option.buttonHeight
         Layout.minimumWidth: button_option.buttonHeight
-        onClicked: root_layout.setCurrentPage('image_test')
+        onClicked: root.setCurrentPage('image_test')
 
     }
     Button{
@@ -48,7 +48,7 @@ ColumnLayout {
         font.pointSize: button_option.buttonTextSize
         Layout.minimumHeight: button_option.buttonHeight
         Layout.minimumWidth: button_option.buttonHeight
-        onClicked: root_layout.setCurrentPage('audio_test')
+        onClicked: root.setCurrentPage('audio_test')
     }
 
 
@@ -58,7 +58,7 @@ ColumnLayout {
         font.pointSize: button_option.buttonTextSize
         Layout.minimumHeight: button_option.buttonHeight
         Layout.minimumWidth: button_option.buttonHeight
-        onClicked: root_layout.setCurrentPage('home')
+        onClicked: root.setCurrentPage('home')
     }
 
 }

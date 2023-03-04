@@ -21,7 +21,7 @@ Page{
         Menu {
             title: qsTr("设置")
             font.pointSize: home_style.textPointSize
-            Action { text: qsTr("设置"); onTriggered: root_layout.setCurrentPage('settings')}
+            Action { text: qsTr("设置"); onTriggered: root.setCurrentPage('settings')}
             MenuSeparator {}
             Action { text: qsTr("导出设置"); onTriggered: export_file_dialog.open()}
             Action { text: qsTr("载入设置"); onTriggered: import_file_dialog.open()}
@@ -29,7 +29,8 @@ Page{
         Menu {
             title: qsTr("关于")
             font.pointSize: home_style.textPointSize
-            Action { text: qsTr("关于"); onTriggered: aboutwindow_loader.active = true}
+            // Action { text: qsTr("关于"); onTriggered: aboutwindow_loader.active = true}
+            Action { text: qsTr("关于"); onTriggered: aboutwindow.visible = true}
         }
     }
     FileDialog {
@@ -46,16 +47,34 @@ Page{
         currentFolder: $config.get_configs_dir()
         onAccepted: $config.import_configs(import_file_dialog.selectedFile)
     }
-    Loader {
-        id: aboutwindow_loader
-        active: false
-        sourceComponent: AboutWindow{
-            id: settings_window
-            visible: true
-            onClosing: aboutwindow_loader.active = false
-        }
+    // MessageDialog {
+    //     id:aboutwindow
+    //     title: "Depression Tester 2.0"
+    //     text: "© 2023 Southeast University"
+    //     // text.font.pointSize: home_style.textPointSize
+    //     buttons: MessageDialog.Ok
+    // }
+    MessageDialog {
+        id:aboutwindow
+        title: "Depression Tester 2.0"
+        text: "© 2023 Southeast University"
+        // text.font.pointSize: home_style.textPointSize
+        buttons: MessageDialog.Ok
     }
-
+    // Loader {
+    //     id: aboutwindow_loader
+    //     active: false
+    //     sourceComponent: AboutWindow{
+    //         id: settings_window
+    //         visible: true
+    //         onClosing: aboutwindow_loader.active = false
+    //     }
+    // }
+            // text: "Depression Tester 2.0"
+            // font.bold: true
+            // font.pointSize: 14
+            // text: "© 2023 Southeast University"
+            // font.pointSize: 14
     ColumnLayout{
         id: start_view
         visible: true
@@ -73,7 +92,7 @@ Page{
             font.pointSize: home_style.titlePointSize
             Layout.alignment: Qt.AlignHCenter
             onClicked: {
-                root_layout.setCurrentPage('option')
+                root.setCurrentPage('option')
                 $test_manager.test_start(name_input.text)
             }
         }

@@ -6,8 +6,8 @@ import QtQuick.Layouts 2.15
 import 'control'
 
 Page{
-    Style{id: settings_style}
     property bool need_combine_image : true
+    Style{id: settings_style}
     QtObject{
         id: configs
         property string image_dataset: "CAPS"
@@ -45,7 +45,6 @@ Page{
     header: RowLayout {
         TabBar {
             id: tabBar
-            // width: parent.width
             TabButton {
                 text: qsTr("图片测试设置")
                 font.pointSize: settings_style.textPointSize
@@ -62,13 +61,14 @@ Page{
         // anchors.top: parent.top
         // anchors.topMargin: 20
         anchors.fill: parent
-        anchors.margins: settings_style.layoutMargins
-        clip: true
+        anchors.margins: settings_style.mainMargins
+        Layout.alignment: Qt.AlignHCenter
         currentIndex: tabBar.currentIndex
         GridLayout {
             columns:2
-            anchors.margins: 100
+            anchors.horizontalCenter: parent.horizontalCenter
             columnSpacing: settings_style.horizontalSpacing
+            // Layout.alignment: Qt.AlignHCenter
             Text {
                 text: qsTr("图片数据集")
                 font.pointSize: settings_style.textPointSize
@@ -143,7 +143,7 @@ Page{
             }
             CheckBox {
                 id: checkBox_if_same_neu_image_for_background
-                visible: need_combine_image
+                enabled: need_combine_image
                 font.pointSize: settings_style.textPointSize
                 implicitHeight: settings_style.checkBoxHeight
                 checked: configs.if_same_neu_image_for_background
@@ -154,7 +154,7 @@ Page{
             }
             CheckBox {
                 id: checkBox_if_same_neu_image_for_neu
-                visible: need_combine_image
+                enabled: need_combine_image
                 font.pointSize: settings_style.textPointSize
                 implicitHeight: settings_style.checkBoxHeight
                 checked: configs.if_same_neu_image_for_neu
@@ -218,11 +218,19 @@ Page{
 
         GridLayout {
             columns:2
+            anchors.horizontalCenter: parent.horizontalCenter
             columnSpacing: settings_style.horizontalSpacing
 
             Text {
                 text: qsTr("题目顺序随机")
                 font.pointSize: settings_style.textPointSize
+            }
+            CheckBox {
+                id: checkBox_if_shuffle_questions
+                enabled: false
+                font.pointSize: settings_style.textPointSize
+                implicitHeight: settings_style.checkBoxHeight
+                // checked: configs.if_shuffle_questions
             }
         }
 
@@ -247,13 +255,13 @@ Page{
             id: button_cancel
             font.pointSize: settings_style.textPointSize
             text: qsTr("取消")
-            onClicked: root_layout.setCurrentPage('home')
+            onClicked: root.setCurrentPage('home')
         }
         Button {
             id: button_save
             font.pointSize: settings_style.textPointSize
             text: qsTr("确定")
-            onClicked: {save_config(); root_layout.setCurrentPage('home')}
+            onClicked: {save_config(); root.setCurrentPage('home')}
         }
     }
 }

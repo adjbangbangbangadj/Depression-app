@@ -13,20 +13,23 @@ Window {
     minimumHeight: 480
 
     function setCurrentPage(name){
-        pages = {'home':'HomePage.qml',
-        'option':'OptionPage.qml',
-        'settings':'SettingsPage.qml',
-        'image_test':'ImageTestPage.qml',
-        'audio_test':'AudioTestPage.qml'}
-        page_loader.source = page[name]
+        let pages = {
+            'home'      :'HomePage.qml'     ,
+            'option'    :'OptionPage.qml'   ,
+            'settings'  :'SettingsPage.qml' ,
+            'image_test':'ImageTestPage.qml',
+            'audio_test':'AudioTestPage.qml'
+        }
+        page_loader.source = pages[name]
 
     }
 
     Loader {
         id: page_loader
+        anchors.fill:parent
         // active: true
         source: 'HomePage.qml'
-        // sourceComponent: AboutWindow{
+        // sourceComponent: Window{
             // id: settings_window
             // visible: true
             // onClosing: Loader.active = false
@@ -34,7 +37,7 @@ Window {
     }
 
     // StackLayout {
-    //     id: root_layout
+    //     id: root
     //     anchors.fill: parent
 
     //     function setCurrentPage(value){
