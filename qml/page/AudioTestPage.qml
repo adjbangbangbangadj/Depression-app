@@ -15,7 +15,7 @@ ColumnLayout {
     }
 
     RowLayout{
-        var question_text = { "question": [{ "content": "你的名字是" }, { "content": "你的性别是" }] }
+        // var question_text = { "question": [{ "content": "你的名字是" }, { "content": "你的性别是" }] }
 
         id: record_control
         property int current_question: 0

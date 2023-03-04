@@ -34,8 +34,8 @@ if __name__ == "__main__":
     # context.setContextProperty("$test", controller.test_controller)
     context.setContextProperty("$config", vars.config)
     engine.addImageProvider("test", vars.image_provider)
-    engine.load(str(vars.executable_path / Path("qml/test_main.qml")))
+    engine.load(str(vars.executable_path / Path("qml/main.qml")))
 
     if not engine.rootObjects():
         sys.exit(-1)
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

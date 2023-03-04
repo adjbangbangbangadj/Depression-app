@@ -3,8 +3,8 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 RowLayout{
-    property  alias textInput: input
-    property  alias textPrompt: prompt
+    property alias textInput: input
+    property alias textPrompt: prompt
     property int inputWidth: 120
     property int inputHeight: 26
     property int pointSize: 12

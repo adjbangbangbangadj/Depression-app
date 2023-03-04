@@ -3,7 +3,6 @@ from PySide6.QtQml import QmlElement
 from csv import DictWriter
 from pathlib import Path
 import vars
-from ..service.neuracle_api import mark, start
 from ..service.image_utils import build_images_consider_gender, read_images, build_background_image
 
 @QmlElement
@@ -19,19 +18,17 @@ class ImageTestBridge(QObject):
         image = self.image_infos[image_index]
         image['user_tag'] = user_tag
         image['duration'] = duration
-        if self.conf["if_use_api"]:
-            mark(1)
+        # if self.conf["if_use_api"]:
+        #     mark(1)
 
-    @Slot()
-    def turn_start(self):
-        """
-        每轮图片开始的时候进行打标
-        """
-        if self.conf["if_use_api"]:
-            mark(0)
+    # # 每轮图片开始的时候进行打标
+    # @Slot()
+    # def turn_start(self):
+    #     if self.conf["if_use_api"]:
+    #         mark(0)
 
     @Slot(str)
-    def test_start(self):
+    def image_init(self):
         # 构建并保存图片(根据设置选择图片源)
         if self.conf['dataset'] == 'K': # TODO
             self.image_infos = read_images(*self.image_nums, if_allowed_images_dup=self.conf["if_allowed_images_dup"])
@@ -40,16 +37,13 @@ class ImageTestBridge(QObject):
                 *self.image_nums(), if_allowed_images_dup=self.conf["if_allowed_images_dup"],
                 if_same_neu_image_for_background=self.conf["if_same_neu_image_for_background"],
                 if_same_neu_image_for_neu=self.conf["if_same_neu_image_for_neu"]))
-
-        x :dict = {}
-        x.update
         # 构建并保存背景
         self.interval_background = build_background_image(
             *(lambda x: [x.size(), x.format()])(self.get_image(0)), self.conf["background_color"])
 
         # 调用api
-        if self.conf["if_use_api"]:
-            start()
+        # if self.conf["if_use_api"]:
+        #     start()
 
         # captureVideoFromCamera()
 
@@ -59,11 +53,9 @@ class ImageTestBridge(QObject):
         # capture_thread.setDaemon(True)
         # capture_thread.start()
 
+    # 测试结束时触发此函数，调用服务将结果写入磁盘
     @Slot()
-    def test_end(self):
-        """
-        测试结束时触发此函数，调用服务将结果写入磁盘
-        """
+    def save_image_test_result(self):
         test_result = []
         for i in self.image_infos:
             test_result.append(dict(name=i['name'],tag=i['tag'], user_tag=i['user_tag'], duration=i['duration']))

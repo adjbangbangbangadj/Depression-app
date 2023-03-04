@@ -26,7 +26,7 @@ config_dir = executable_path / Path('config.ini')
 config = conf.conf_manager
 try:
     config_file = open('config.ini','r')
-    config.read_file(config_file)
+    # config.read_file(config_file)
 except Exception as e:
     logging.warning('Could not read config.ini file!')
     raise

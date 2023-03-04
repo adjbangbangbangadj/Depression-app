@@ -2,12 +2,9 @@ import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-// import QtQuick.Controls.Material 2.2
+
 
 Window {
-
-    // Material.theme: Material.Light
-
     id:root
     width: 800
     height: 600
@@ -30,36 +27,9 @@ Window {
 //        result_view.visible = true
         option_main.visible = true
     }
-
-    Loader {
-        id: settings_window_loader
-        active: false
-        sourceComponent: SettingsWindow{
-            minimumWidth: 640
-            minimumHeight: 480
-            maximumHeight: minimumHeight
-            maximumWidth: minimumWidth
-            id:settings_window
-            visible: true
-            onClosing: settings_window_loader.active = false
-        }
+    SettingsWindow{
+        id:settings_window
     }
-
-    // Loader {
-    //     id: settings_window_loader
-    //     active: false
-    //     sourceComponent: SettingsWindow{
-    //         minimumWidth: 640
-    //         minimumHeight: 480
-    //         maximumHeight: minimumHeight
-    //         maximumWidth: minimumWidth
-    //         id:settings_window
-    //         width: 100
-    //         height: 100
-    //         visible: true
-    //         onClosing: settings_window_loader.active = false
-    //     }
-    // }
 
     ColumnLayout{
         id: start_view
@@ -87,7 +57,7 @@ Window {
             Layout.preferredHeight: 40
             font.pointSize: 14
             Layout.alignment: Qt.AlignHCenter
-            onClicked: settings_window_loader.active = true
+            onClicked: settings_window.show()
         }
         PromptTextInput{
             id: name_layout
@@ -99,6 +69,44 @@ Window {
             textInput.text: username
         }
     }
+//    GridLayout{
+//        id: result_view
+//        visible: false
+//        anchors.horizontalCenter: parent.horizontalCenter
+//        anchors.verticalCenter: parent.verticalCenter
+
+//        Text {
+//            id: prompt_finish
+//            text: qsTr("测试结束，请关闭程序")
+//            font.pointSize: 14
+//        }
+
+//    }
+    OptionMain{
+        id: option_main
+        visible: false
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.margins: 80
+
+    }
+
+    RecorderView{
+        id:recorder_view
+        visible: false
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.margins: 30
+    }
+
+    PicTestView{
+        id: test_view
+        visible: false
+        anchors.fill: parent
+        anchors.margins: 30
+        onTestEnd: root.end_test()
+    }
+
 
 
 }

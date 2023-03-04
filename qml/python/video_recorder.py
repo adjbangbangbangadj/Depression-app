@@ -1,9 +1,10 @@
 import cv2
 import threading
 
-class VideoCaptureThread(threading.Thread):
+class VideoRecorder(threading.Thread):
     def __init__(self, video_source, output_file):
-        threading.Thread.__init__(self)
+        super().__init__(self)
+        self.flag = True
         self.video_source = video_source
         self.output_file = output_file
         self.capture = cv2.VideoCapture(self.video_source)
@@ -13,7 +14,8 @@ class VideoCaptureThread(threading.Thread):
         self.video_writer = cv2.VideoWriter(self.output_file, cv2.VideoWriter_fourcc(*'XVID'), self.fps, (self.width, self.height))
 
     def run(self):
-        while True:
+        self.flag = True
+        while self.flag:
             ret, frame = self.capture.read()
             frame = cv2.flip(frame, 1) #水平翻转
             if ret:
@@ -23,8 +25,5 @@ class VideoCaptureThread(threading.Thread):
         self.capture.release()
         self.video_writer.release()
 
-# if __name__ == '__main__':
-#     video_source = 0  # 0 for webcam, or path to video file
-#     output_file = 'output.avi'
-#     capture_thread = VideoCaptureThread(video_source, output_file)
-#     capture_thread.start()
+    def end(self):
+        self.flag = False

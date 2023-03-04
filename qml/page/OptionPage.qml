@@ -30,24 +30,22 @@ ColumnLayout {
     }
 
     Button{
-        id: button_record_test
-        text: qsTr("语音测试")
-        font.pointSize: button_option.buttonTextSize
-        Layout.minimumHeight: button_option.buttonHeight
-        Layout.minimumWidth: button_option.buttonHeight
-        enabled: button_option.buttons_enabled
-        onClicked: button_option.button_record_click()
-    }
-
-    Button{
         id: button_image_test
         text: qsTr("图片测试")
         font.pointSize: button_option.buttonTextSize
         Layout.minimumHeight: button_option.buttonHeight
         Layout.minimumWidth: button_option.buttonHeight
-        enabled: button_option.buttons_enabled
-        onClicked: button_option.button_image_click()
+        onClicked: root_layout.setCurrentPage('image_test')
     }
+    Button{
+        id: button_record_test
+        text: qsTr("语音测试")
+        font.pointSize: button_option.buttonTextSize
+        Layout.minimumHeight: button_option.buttonHeight
+        Layout.minimumWidth: button_option.buttonHeight
+        onClicked: root_layout.setCurrentPage('audio_test')
+    }
+
 
     Button{
         id: button_end_test
@@ -55,8 +53,7 @@ ColumnLayout {
         font.pointSize: button_option.buttonTextSize
         Layout.minimumHeight: button_option.buttonHeight
         Layout.minimumWidth: button_option.buttonHeight
-        enabled: button_option.buttons_enabled
-        onClicked: button_option.button_end_click()
+        onClicked: root_layout.setCurrentPage('home')
     }
 
 }
