@@ -5,19 +5,19 @@ from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from pathlib import Path
 import sys
 
-import conf
+import controller.config_controller as config_controller
 import vars
 from bridges.image_tester import ImageTester
 from bridges.audio_tester import AudioTester
 from bridges.main_tester import MainTester
 from controller.file_utils import FileUtils
-from controller.neuracle_trigger import NeuracleTrigger
+from utils.neuracle_trigger import NeuracleTrigger
 
 
 if __name__ == "__main__":
     file_utils = FileUtils()
     neuracle_trigger = NeuracleTrigger()
-    vars.config = conf.ConfigManager()
+    vars.configuration = config_controller.ConfigManager()
 
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
@@ -28,11 +28,11 @@ if __name__ == "__main__":
 
     context = engine.rootContext()
     context.setContextProperty("$file_utils", file_utils)
-    context.setContextProperty("$trigger", neuracle_trigger)
-    context.setContextProperty("$config", vars.config)
+    context.setContextProperty("$neuracle_trigger", neuracle_trigger)
+    context.setContextProperty("$config", vars.configuration)
 
     engine.addImageProvider("main", vars.image_provider)
-    engine.load(str(vars.executable_path / Path("app/main.qml")))
+    engine.load(str(vars.executable_path / Path("app/Main.qml")))
 
     if not engine.rootObjects():
         sys.exit(-1)

@@ -1,16 +1,20 @@
 from PySide6.QtCore import QObject, Slot
 from utils.audio_recorder import AudioRecorderThread
 from pathlib import Path
-import vars
+from vars import configuration, data_dir
 import logging
+
+_question_dir = data_dir / Path ('questions/')
 
 class AudioTester(QObject):
     def __init__(self):
         super().__init__()
         self.question: list = []
+        for i in _question_dir.glob('*.txt'):
+            ...
         # opennnnnnnnn questions
 
-    @Slot(result='str')
+    @Slot(result='QString')
     def get_questiion(self, index):
         return self.question[index]
 

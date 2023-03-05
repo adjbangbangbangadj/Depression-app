@@ -48,8 +48,8 @@ ColumnLayout {
             id: record_start
             text: qsTr("开始录音")
             font.pointSize: record_control.buttonTextSize
-            Layout.minimumHeight: record_control.buttonHeight
-            Layout.minimumWidth: record_control.buttonWidth
+            Layout.preferredHeight: record_control.buttonHeight
+            Layout.preferredWidth: record_control.buttonWidth
             enabled: record_control.buttons_enabled
             onClicked: record_control.record_start_click()
         }
@@ -57,8 +57,8 @@ ColumnLayout {
             id: record_stop
             text: qsTr("停止录音")
             font.pointSize: record_control.buttonTextSize
-            Layout.minimumHeight: record_control.buttonHeight
-            Layout.minimumWidth: record_control.buttonWidth
+            Layout.preferredHeight: record_control.buttonHeight
+            Layout.preferredWidth: record_control.buttonWidth
             enabled: false
             onClicked: record_control.record_stop_click()
         }
@@ -66,8 +66,8 @@ ColumnLayout {
             id: record_next
             text: qsTr("下一步")
             font.pointSize: record_control.buttonTextSize
-            Layout.minimumHeight: record_control.buttonHeight
-            Layout.minimumWidth: record_control.buttonWidth
+            Layout.preferredHeight: record_control.buttonHeight
+            Layout.preferredWidth: record_control.buttonWidth
             enabled: false
             onClicked: record_control.record_next_click()
         }

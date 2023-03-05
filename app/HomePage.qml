@@ -5,22 +5,22 @@ import QtQuick.Layouts 2.15
 import QtQuick.Dialogs
 
 import 'control'
+import 'style'
 
 Page{
-    // property path
-    Style {id:home_style}
+    HomeStyle { id:homeStyle }
     header: MenuBar {
-        font.pointSize: home_style.textPointSize
+        font.pointSize: homeStyle.textPointSize
         Menu {
             title: qsTr("文件")
-            font.pointSize: home_style.textPointSize
+            font.pointSize: homeStyle.textPointSize
             Action { text: qsTr("打开结果目录"); onTriggered: $file_utils.open_results_dir()}
             Action { text: qsTr("打开日志目录"); onTriggered: $file_utils.open_log_dir()}
             Action { text: qsTr("打开数据目录"); onTriggered: $file_utils.open_data_dir()}
         }
         Menu {
             title: qsTr("设置")
-            font.pointSize: home_style.textPointSize
+            font.pointSize: homeStyle.textPointSize
             Action { text: qsTr("设置"); onTriggered: root.setCurrentPage('settings')}
             MenuSeparator {}
             Action { text: qsTr("导出设置"); onTriggered: export_file_dialog.open()}
@@ -28,7 +28,7 @@ Page{
         }
         Menu {
             title: qsTr("关于")
-            font.pointSize: home_style.textPointSize
+            font.pointSize: homeStyle.textPointSize
             // Action { text: qsTr("关于"); onTriggered: aboutwindow_loader.active = true}
             Action { text: qsTr("关于"); onTriggered: aboutwindow.visible = true}
         }
@@ -37,73 +37,89 @@ Page{
         id: export_file_dialog
         fileMode: FileDialog.SaveFile
         nameFilters: ["Configuration files (*.ini)"]
-        currentFolder: $config.get_configs_dir()
-        onAccepted: $config.export_configs(export_file_dialog.selectedFile)
+        Component.onCompleted: currentFolder = $config.get_configs_dir()
+        onAccepted: {
+            if ($config.export_configs(export_file_dialog.selectedFile) == false)
+            export_failure_window.path = export_file_dialog.selectedFile
+            export_failure_window.visible = true
+        }
     }
     FileDialog {
         id: import_file_dialog
         fileMode: FileDialog.OpenFile
         nameFilters: ["Configuration files (*.ini)"]
-        currentFolder: $config.get_configs_dir()
-        onAccepted: $config.import_configs(import_file_dialog.selectedFile)
+        Component.onCompleted: currentFolder = $config.get_configs_dir()
+        onAccepted: {
+            if ($config.import_configs(import_file_dialog.selectedFile) == false)
+            import_failure_window.path = import_file_dialog.selectedFile
+            import_failure_window.visible = true
+        }
     }
-    // MessageDialog {
-    //     id:aboutwindow
-    //     title: "Depression Tester 2.0"
-    //     text: "© 2023 Southeast University"
-    //     // text.font.pointSize: home_style.textPointSize
-    //     buttons: MessageDialog.Ok
-    // }
+    MessageDialog {
+        id:export_failure_window
+        property string path: ""
+        title:  qsTr("设置导出失败")
+        text: qsTr("无法导出设置至" + path)
+        buttons: MessageDialog.Ok
+    }
+    MessageDialog {
+        id:import_failure_window
+        property string path: ""
+        title: qsTr("设置导入失败")
+        text: qsTr("无法从" + path + "导入设置")
+        buttons: MessageDialog.Ok
+    }
     MessageDialog {
         id:aboutwindow
         title: "Depression Tester 2.0"
         text: "© 2023 Southeast University"
-        // text.font.pointSize: home_style.textPointSize
         buttons: MessageDialog.Ok
     }
     // Loader {
     //     id: aboutwindow_loader
     //     active: false
-    //     sourceComponent: AboutWindow{
-    //         id: settings_window
-    //         visible: true
-    //         onClosing: aboutwindow_loader.active = false
+    //     sourceComponent: MessageDialog{
+    //         id:aboutwindow
+    //         title: "Depression Tester 2.0"
+    //         text: "© 2023 Southeast University"
+    //         buttons: MessageDialog.Ok
+    //         onButtonClicked: aboutwindow_loader.active = false
     //     }
     // }
-            // text: "Depression Tester 2.0"
-            // font.bold: true
-            // font.pointSize: 14
-            // text: "© 2023 Southeast University"
-            // font.pointSize: 14
+
     ColumnLayout{
         id: start_view
         visible: true
-        spacing: 20
-        width: 480
-        height: 120
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
+        spacing: homeStyle.mainLayoutSpacing
+        width: homeStyle.mainLayoutWidth
+        height: homeStyle.mainLayoutHeight
+        anchors.centerIn: parent
 
         Button {
             id: button_start
             text: qsTr("开始测试")
-            Layout.preferredWidth: 200
-            Layout.preferredHeight: 40
-            font.pointSize: home_style.titlePointSize
+            Layout.preferredWidth: homeStyle.mainButtonWidth
+            Layout.preferredHeight: homeStyle.mainButtonHeight
             Layout.alignment: Qt.AlignHCenter
+            font.pointSize: homeStyle.titlePointSize
             onClicked: {
-                root.setCurrentPage('option')
-                $test_manager.test_start(name_input.text)
+                root.setCurrentPage('test')
+                // $test_manager.test_start(name_input.text)
             }
         }
 
         PromptTextInput{
             id: name_input
             Layout.alignment: Qt.AlignHCenter
-            pointSize: home_style.titlePointSize
+            pointSize: homeStyle.titlePointSize
             inputHeight: 34
             inputWidth: 120
             textPrompt.text: qsTr("姓名：")
+            textInput.text: root.username
+        }
+
+        Item{ //work like QSpacerItem
+            Layout.fillHeight: true
         }
     }
 }

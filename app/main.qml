@@ -1,6 +1,5 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
-import QtQuick.Layouts 2.15
 
 Window {
     id: root
@@ -12,20 +11,20 @@ Window {
     minimumWidth: 640
     minimumHeight: 480
 
+    property string username: ''
+
     function setCurrentPage(name){
         let pages = {
-            'home'      :'HomePage.qml'     ,
-            'option'    :'OptionPage.qml'   ,
-            'settings'  :'SettingsPage.qml' ,
-            'image_test':'ImageTestPage.qml',
-            'audio_test':'AudioTestPage.qml'
+            'home'      :'HomePage.qml',
+            'test'      :'TestMain.qml',
+            'settings'  :'SettingsPage.qml'
         }
-        page_loader.source = pages[name]
+        main_page_loader.source = pages[name]
 
     }
 
     Loader {
-        id: page_loader
+        id: main_page_loader
         anchors.fill:parent
         // active: true
         source: 'HomePage.qml'

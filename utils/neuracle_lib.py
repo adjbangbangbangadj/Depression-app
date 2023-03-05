@@ -11,6 +11,7 @@
 import serial
 import serial.tools.list_ports
 import time
+import logging
 from ctypes import *
 
 '''
@@ -100,16 +101,16 @@ class TriggerBox(object):
             return False
         self._device_comport_handle = serial.Serial(self._serial_name,baudrate=115200,timeout=60)
         if self._device_comport_handle.isOpen():
-            print("Open %s successfully." % (self._serial_name))
+            logging.info("Open %s successfully." % (self._serial_name))
             recv = self.get_device_name()
             if recv == None:
-                print('Not a valid device due to response for getting device name is none!!')
+                logging.warning('Not a valid device due to response for getting device name is none!!')
                 return False
             self._device_name = recv
             return True
 
         else:
-            print("Open %s failed." % (self._serial_name))
+            logging.warning("Open %s failed." % (self._serial_name))
             return False
 
     def get_device_name(self):
@@ -182,7 +183,7 @@ class TriggerBox(object):
             sensorTypeIdx = info[i * 2]
             sensorNum = info[i * 2 + 1]
             sensorType = self._getSensorTypeString(sensorTypeIdx)
-            print("SensorType : %15s, SensorNum: %d " % (sensorType, sensorNum))
+            logging.info("SensorType : %15s, SensorNum: %d " % (sensorType, sensorNum))
             self._sensor_info.append(dict(Type=sensorType, Number=sensorNum))
         # print(self._sensor_info)
         return
@@ -246,9 +247,9 @@ class TriggerBox(object):
         self.send(cmd)
         data = self.read(cmd.frame.functionID)
         if data[0] == cmd.sensorInfo.sensorType and data[1] == cmd.sensorInfo.sensorNum:
-            print("setSensorPara successfully...")
+            logging.info("setSensorPara successfully...")
         else:
-            print("setSensorPara failed...")
+            logging.warning("setSensorPara failed...")
         return
 
     def get_sensor_sample(self, sensorID):
@@ -264,9 +265,9 @@ class TriggerBox(object):
         adcResult = 0
         if data[0] == cmd.sensorInfo.sensorType and data[1] == cmd.sensorInfo.sensorNum:
             adcResult = data[2] | (data[3] << 8)
-            print("getSensorSample successfully...adcResult: %d" % (adcResult))
+            logging.info("getSensorSample successfully...adcResult: %d" % (adcResult))
         else:
-            print("getSensorSample failed...")
+            logging.warning("getSensorSample failed...")
         return adcResult
 
     def set_event_data(self, sensorID, eventData, triggerTOBeOut=1):
@@ -306,16 +307,15 @@ class TriggerBox(object):
 
     def check_online(self):
         if len(self._port_list) <= 0:
-            print("Can't find any serial port online.")
+            logging.warning("Can't find any serial port online.")
             return False
         for idx, p in enumerate(self._port_list):
             if p.device == self._serial_name:
-                print("Target serial [%s] port (%s) online." % (p.device, p.description))
+                logging.info("Target serial [%s] port (%s) online." % (p.device, p.description))
                 return True
-        print("Target serial [%s] port offline.\n" % (self._serial_name))
-        print("Online serial list:")
-        for idx, p in enumerate(self._port_list):
-            print("%s : %s" % (p.device, p.description))
+        logging.info("Target serial [%s] port offline.\n" % (self._serial_name))
+        logging.info("Online serial list:" + \
+            "\n".join(["%s : %s" % (p.device, p.description) for idx, p in enumerate(self._port_list)]))
         return False
 
     def send(self, data):
@@ -355,7 +355,7 @@ class TriggerBox(object):
         # print("getDeviceInfo response payload : %d" % (rspPayload))
         # recv = self._device_comport_handle.read_all()
         recv = self._device_comport_handle.read(rspPayload)
-        print(str(recv))
+        logging.info(str(recv))
         return recv
 
     def set_audioSensor_threshold(self, sensorID):

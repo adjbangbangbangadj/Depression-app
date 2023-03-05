@@ -2,63 +2,71 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 2.15
 
-ColumnLayout {
-    id: button_option
+import "style"
+import Main
 
-    // onVisibleChanged:{
-    //     if (visible==true)
-    //         ...
-    // }
+Item{
+    ColumnLayout {
+        id: option_page
+        TestMainStyle{ id: testMainStyle }
 
-    spacing: 80
-    property int buttonHeight: 50
-    property int buttonWidth: 150
-    property int buttonTextSize: 14
+        width: testMainStyle.mainLayoutWidth
+        height: testMainStyle.optionLayoutHeight
+        spacing: testMainStyle.mainLayoutSpacing
+        anchors.centerIn: parent
 
-    function button_record_click(){
-        option_main.visible = false
-        recorder_view.visible = true
-        button_record_test.enabled = false
+        // function button_record_click(){
+        //     option_main.visible = false
+        //     recorder_view.visible = true
+        //     button_record_test.enabled = false
+        // }
+
+        // function button_image_click(){
+        //     $test.begin_test(username)
+        //     option_main.visible = false
+        //     test_view.visible = true
+        //     button_image_test.enabled = false
+        //     test_view.begin_test()
+        // }
+
+        // function button_end_click(){
+
+        // }
+
+        Button{
+            id: button_image_test
+            text: qsTr("图片测试")
+            font.pointSize: testMainStyle.titlePointSize
+            Layout.preferredHeight: testMainStyle.mainButtonHeight
+            Layout.preferredWidth: testMainStyle.mainButtonWidth
+            Layout.alignment:Qt.AlignHCenter
+            onClicked: test_root.setCurrentPage('image_test')
+
+        }
+        Button{
+            id: button_record_test
+            text: qsTr("语音测试")
+            font.pointSize: testMainStyle.titlePointSize
+            Layout.preferredHeight: testMainStyle.mainButtonHeight
+            Layout.preferredWidth: testMainStyle.mainButtonWidth
+            Layout.alignment:Qt.AlignHCenter
+            onClicked: test_root.setCurrentPage('audio_test')
+        }
+
+
+        Button{
+            id: button_end_test
+            text: qsTr("结束测试")
+            Layout.preferredHeight: testMainStyle.mainButtonHeight
+            Layout.preferredWidth: testMainStyle.mainButtonWidth
+            Layout.alignment:Qt.AlignHCenter
+            font.pointSize: testMainStyle.titlePointSize
+            // onClicked: root.setCurrentPage('home')
+        }
+
+        Item{ //work like QSpacerItem
+            Layout.fillHeight: true
+        }
+
     }
-
-    function button_image_click(){
-        $test.begin_test(username)
-        option_main.visible = false
-        test_view.visible = true
-        button_image_test.enabled = false
-        test_view.begin_test()
-    }
-
-    function button_end_click(){
-
-    }
-
-    Button{
-        id: button_image_test
-        text: qsTr("图片测试")
-        font.pointSize: button_option.buttonTextSize
-        Layout.minimumHeight: button_option.buttonHeight
-        Layout.minimumWidth: button_option.buttonHeight
-        onClicked: root.setCurrentPage('image_test')
-
-    }
-    Button{
-        id: button_record_test
-        text: qsTr("语音测试")
-        font.pointSize: button_option.buttonTextSize
-        Layout.minimumHeight: button_option.buttonHeight
-        Layout.minimumWidth: button_option.buttonHeight
-        onClicked: root.setCurrentPage('audio_test')
-    }
-
-
-    Button{
-        id: button_end_test
-        text: qsTr("结束测试")
-        font.pointSize: button_option.buttonTextSize
-        Layout.minimumHeight: button_option.buttonHeight
-        Layout.minimumWidth: button_option.buttonHeight
-        onClicked: root.setCurrentPage('home')
-    }
-
 }

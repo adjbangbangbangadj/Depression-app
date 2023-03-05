@@ -45,18 +45,18 @@ for d in [data_dir, logs_dir, configs_dir, results_dir]:
     check_dir(d)
 
 
-config = None
+configuration = None
 test_info = None
 
 def TestInfo(username, begin_time = None):
     begin_time = begin_time or datetime.now()
     dir_name = '_'.join([x for x in [username, begin_time.strftime('%Y-%m-%d_%H-%M-%S')] if x])
-    result_dir = executable_path / Path(dir_name)
+    result_dir = results_dir / Path(dir_name)
     try:
         result_dir.mkdir()
     except OSError:
         raise
-    return namedtuple('TestInfo',[username, begin_time, result_dir])(username, begin_time, result_dir)
+    return namedtuple('TestInfo',['username', 'begin_time', 'result_dir'])(username, begin_time, result_dir)
 
 
 class ImageProvider(QQuickImageProvider):
@@ -65,12 +65,12 @@ class ImageProvider(QQuickImageProvider):
         self.images:dict = {}
 
     def requestImage(self, id, size, requestedSize):
-        return self.images['id']
+        return self.images[id]
         # if id == "background":
             # return vars.interval_background
         # return vars.get_pic(int(id))
 
     def set_image(self, name, value):
-        self.image[name] = value
+        self.images[str(name)] = value
 
 image_provider = ImageProvider()

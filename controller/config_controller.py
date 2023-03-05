@@ -8,7 +8,7 @@ import logging
 
 _default_configs_dict = {
     'image_test':{
-        'image_dataset': "CAPS",
+        'image_dataset': 'CAPS',
         'pos_image_num': 7,
         'neu_image_num': 6,
         'neg_image_num': 7,
@@ -18,7 +18,7 @@ _default_configs_dict = {
         'answer_duration': 4000,
         'interval_duration': 3000,
         'if_end_immediately_after_answer': True,
-        'background_color': "black",
+        'background_color': 'black',
         'if_background_fill_view': False,
         'if_record_video': True,
     },
@@ -38,9 +38,20 @@ class ConfigManager(QObject):
         self.config.read_dict(_default_configs_dict)
 
 
-    @Slot(str, str, result="str")
     def get(self, section_name:str, option_name:str):
         return self.config[section_name][option_name]
+
+    @Slot(str, str, result='int')
+    def get_int(self, section_name:str, option_name:str):
+        return int(self.get(section_name, option_name))
+
+    @Slot(str, str, result='bool')
+    def get_bool(self, section_name:str, option_name:str):
+        return bool(self.get(section_name, option_name))
+
+    @Slot(str, str, result='QString')
+    def get_str(self, section_name:str, option_name:str):
+        return str(self.get(section_name, option_name))
 
     @Slot(str, str)
     def set_config(self, name, value) -> None:
