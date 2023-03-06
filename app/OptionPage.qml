@@ -49,7 +49,7 @@ Item{
             Layout.alignment:Qt.AlignHCenter
             font.pointSize: testMainStyle.titlePointSize
             onClicked: {
-                if ($config.get_bool('general', 'comform_before_test_end') &&
+                if ($config.general__comform_before_test_end &&
                     test_root.uncompleted_tests.length === 0)
                     comform_test_end_dialog.visible = true
                 else

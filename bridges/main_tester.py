@@ -12,8 +12,8 @@ TEST_LIST = ['image_test','audio_test']
 
 class MainTester(QObject):
     def __init__(self):
+        super().__init__()
         self.video_record_skiped = []
-        # self.completed_tests = []
         for test_name in TEST_LIST:
             self.video_record_skiped.append(not root.configuration.get(test_name,_IF_RECORD_VIDEO_CONFIG_NAME))
 

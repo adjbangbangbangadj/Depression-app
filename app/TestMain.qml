@@ -8,25 +8,25 @@ Item {
 
     MainTester {
         id: main_tester
-        // Component.onCompleted: main_tester.test_start(root.username)
+        Component.onCompleted: main_tester.test_start(root.username)
     }
-    // property var tests: JSON.parse(main_tester.get_tests())
-    // property var completed_tests: []
-    // property var uncompleted_tests: tests.filter(value => !completed_tests.includes(value))
+    property var tests: JSON.parse(main_tester.get_tests())
+    property var completed_tests: []
+    property var uncompleted_tests: tests.filter(value => !completed_tests.includes(value))
 
-    // function setCurrentPage(name){
-    //     const pages = {
-    //         'option'    :'OptionPage.qml'   ,
-    //         'image_test':'ImageTestPage.qml',
-    //         'audio_test':'AudioTestPage.qml'
-    //     }
-    //     test_page_loader.source = pages[name]
-    // }
+    function setCurrentPage(name){
+        const pages = {
+            'option'    :'OptionPage.qml'   ,
+            'image_test':'ImageTestPage.qml',
+            'audio_test':'AudioTestPage.qml'
+        }
+        test_page_loader.source = pages[name]
+    }
 
 
-    // Loader {
-    //     id: test_page_loader
-    //     anchors.fill:parent
-    //     source: 'OptionPage.qml'
-    // }
+    Loader {
+        id: test_page_loader
+        anchors.fill:parent
+        source: 'OptionPage.qml'
+    }
 }

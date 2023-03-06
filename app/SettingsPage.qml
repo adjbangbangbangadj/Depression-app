@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 2.15
+import QtQuick.Dialogs
 
 import 'control'
 import 'style'
@@ -9,28 +10,6 @@ import 'style'
 Page{
     property bool need_combine_image : true
     SettingsStyle{ id: settingsStyle }
-    QtObject{
-        id: image_test_config
-        // property string image_dataset: $config.image_test__image_dataset
-        property string image_dataset: $config.get_str('image_test', 'image_dataset')
-        property int pos_image_num: $config.get_int('image_test',"pos_image_num")
-        property int neu_image_num: $config.get_int('image_test',"neu_image_num")
-        property int neg_image_num: $config.get_int('image_test','neg_image_num')
-        property bool if_same_neu_image_for_neu: $config.get_bool('image_test','if_same_neu_image_for_neu')
-        property bool if_same_neu_image_for_background: $config.get_bool('image_test','if_same_neu_image_for_background')
-        property bool if_allowed_images_dup: $config.get_bool('image_test','if_allowed_images_dup')
-        property double answer_duration: $config.get_float('image_test','answer_duration')
-        property double interval_duration: $config.get_float('image_test','interval_duration')
-        property bool if_end_immediately_after_answer: $config.get_bool('image_test', 'if_end_immediately_after_answer')
-        property bool if_background_fill_view: $config.get_bool('image_test', 'if_background_fill_view')
-        property string background_color: $config.get_str('image_test', 'background_color')
-    }
-    QtObject{
-        id: _test_config
-        property string image_dataset: $config.get_str('image_test', 'image_dataset')
-        property int pos_image_num: $config.get_int('image_test',"pos_image_num")
-
-    }
 
     property var confine:{
         "pos":70,
@@ -38,19 +17,13 @@ Page{
         "neg":70
     }
 
-    // function reset_configs_to_default(){
-    //     attrs.configs = Object.assign({}, attrs.default_configs)
-    //     update()
-    // }
-
-    // function save_config(){
-    //     $config.end_edit(JSON.stringify(attrs.configs))
-    // }
-
-
     header: RowLayout {
         TabBar {
             id: tabBar
+            TabButton {
+                text: qsTr("常规设置")
+                font.pointSize: settingsStyle.textPointSize
+            }
             TabButton {
                 text: qsTr("图片测试设置")
                 font.pointSize: settingsStyle.textPointSize
@@ -70,6 +43,28 @@ Page{
         anchors.topMargin: 20
 
         currentIndex: tabBar.currentIndex
+        Item{
+            GridLayout {
+                columns:2
+                width: settingsStyle.settingsLayoutWidth
+                anchors.horizontalCenter: parent.horizontalCenter
+                columnSpacing: settingsStyle.settingsHSpacing
+
+                Item{Layout.preferredWidth : settingsStyle.settingsLayoutWidth / 2}
+                Item{Layout.preferredWidth : settingsStyle.settingsLayoutWidth / 2}
+                    // TODO:
+                // Text {
+                //     text: qsTr("窗口")
+                //     font.pointSize: settingsStyle.textPointSize
+                // }
+                // CheckBox {
+                //     id: checkBox_if_shuffle_questions
+                //     enabled: false
+                //     Layout.preferredHeight: settingsStyle.settingsBoxHeight
+                //     // checked: $configs.audio_test__if_shuffle_questions
+                // }
+            }
+        }
         Item{
             GridLayout {
                 columns:2
@@ -119,7 +114,7 @@ Page{
                     Layout.preferredHeight: settingsStyle.settingsBoxHeight
                     editable:true
                     from:0; to:confine["pos"]
-                    value: configs.pos_image_num
+                    value: $configs.image_test__pos_image_num
                 }
                 Text {
                     text: qsTr("中性图片数")
@@ -132,7 +127,7 @@ Page{
                     Layout.preferredHeight: settingsStyle.settingsBoxHeight
                     editable:true
                     from:0; to:confine["neu"]
-                    value: configs.neu_image_num
+                    value: $configs.image_test__neu_image_num
                 }
                 Text {
                     text: qsTr("消极图片数")
@@ -145,7 +140,7 @@ Page{
                     Layout.preferredHeight: settingsStyle.settingsBoxHeight
                     editable:true
                     from:0; to:confine["neg"]
-                    value: configs.neg_image_num
+                    value: $configs.image_test__neg_image_num
                 }
                 Text {
                     text: qsTr("在组合图片时使用相同的三张中性图片")
@@ -155,7 +150,7 @@ Page{
                     id: checkBox_if_same_neu_image_for_background
                     enabled: need_combine_image
                     Layout.preferredHeight: settingsStyle.settingsBoxHeight
-                    checked: configs.if_same_neu_image_for_background
+                    checked: $configs.image_test__if_same_neu_image_for_background
                 }
                 Text {
                     text: qsTr("在组合中性测试图片时使用四张相同中性图片")
@@ -165,7 +160,7 @@ Page{
                     id: checkBox_if_same_neu_image_for_neu
                     enabled: need_combine_image
                     Layout.preferredHeight: settingsStyle.settingsBoxHeight
-                    checked: configs.if_same_neu_image_for_neu
+                    checked: $configs.image_test__if_same_neu_image_for_neu
                 }
                 Text {
                     text: qsTr("允许图片重复")
@@ -174,7 +169,7 @@ Page{
                 CheckBox {
                     id: checkBox_if_allowed_images_dup
                     Layout.preferredHeight: settingsStyle.settingsBoxHeight
-                    checked: configs.if_allowed_images_dup
+                    checked: $configs.image_test__if_allowed_images_dup
                 }
                 Text {
                     text: qsTr("每张图片作答时长（单位秒）")
@@ -185,7 +180,7 @@ Page{
                     Layout.preferredWidth: settingsStyle.settingsBoxWidth
                     Layout.preferredHeight: settingsStyle.settingsBoxHeight
                     font.pointSize: settingsStyle.textPointSize
-                    doubleValue: configs.answer_duration
+                    doubleValue: $configs.image_test__answer_duration
                 }
                 Text {
                     text: qsTr("两张图片间隔时长（单位秒）")
@@ -196,7 +191,7 @@ Page{
                     Layout.preferredWidth: settingsStyle.settingsBoxWidth
                     Layout.preferredHeight: settingsStyle.settingsBoxHeight
                     font.pointSize: settingsStyle.textPointSize
-                    doubleValue: configs.interval_duration
+                    doubleValue: $configs.image_test__interval_duration
                 }
                 Text {
                     text: qsTr("在图片作答后立刻结束对该图片的作答")
@@ -205,21 +200,24 @@ Page{
                 CheckBox {
                     id: checkBox_if_end_immediately
                     Layout.preferredHeight: settingsStyle.settingsBoxHeight
-                    checked:configs.if_end_immediately_after_answer
+                    checked: $configs.image_test__if_end_immediately_after_answer
+                }
+                Text {
+                    text: qsTr("")
+                    font.pointSize: settingsStyle.textPointSize
+                }
+                CheckBox {
+                    id: checkBox_image_
+                    Layout.preferredHeight: settingsStyle.settingsBoxHeight
+                    checked: $configs.image_test__if_end_immediately_after_answer
                 }
                 // Text {
                 //     text: qsTr("背景颜色")
                 //     font.pointSize: settingsStyle.textPointSize
                 // }
-                // PromptTextInput{
-                //     id: input_background_color
-                //     pointSize: settingsStyle.textPointSize
-                //     inputWidth: settingsStyle.normalInputWidth
-                //     Component.onCompleted: attrs.comps_need_updated.push(input_background_color)
-                //     textPrompt.text: qsTr("")
-                //     textInput.onEditingFinished:  attrs.configs["background_color"] = textInput.text
-                //     function update(){textInput.text = attrs.configs["background_color"]}
-                // }
+                // ColorDialog
+                // TODO: color
+                // TODO: video
             }
         }
         Item{
@@ -238,10 +236,12 @@ Page{
                 CheckBox {
                     id: checkBox_if_shuffle_questions
                     enabled: false
+                    // TODO: enable
                     Layout.preferredHeight: settingsStyle.settingsBoxHeight
-                    // checked: configs.if_shuffle_questions
+                    // checked: $configs.audio_test__if_shuffle_questions
                 }
             }
+                // TODO: video
         }
 
     }
@@ -250,16 +250,17 @@ Page{
         Item {
             Layout.fillWidth: true
         }
-        Button {
-            id: button_reset
-            font.pointSize: settingsStyle.textPointSize
-            text: qsTr("恢复默认值")
-            onClicked: {
-                // for (var prop in configs) {
-                //     print(prop += " (" + typeof(configs[prop]) + ") = " + configs[prop]);
-                // }
-            }
-        }
+        // Button {
+        //     id: button_reset
+        //     font.pointSize: settingsStyle.textPointSize
+        //     text: qsTr("恢复默认值")
+        //     onClicked: {
+        //         // for (var prop in configs) {
+        //         //     print(prop += " (" + typeof(configs[prop]) + ") = " + configs[prop]);
+        //         // }
+        //     }
+        // }
+        //TODO
         Button {
             id: button_cancel
             font.pointSize: settingsStyle.textPointSize
@@ -270,7 +271,7 @@ Page{
             id: button_save
             font.pointSize: settingsStyle.textPointSize
             text: qsTr("确定")
-            onClicked: {save_config(); root.setCurrentPage('home')}
+            onClicked: {$config.save_changes(); root.setCurrentPage('home')}
         }
     }
 }

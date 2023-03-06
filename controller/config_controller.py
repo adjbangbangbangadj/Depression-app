@@ -4,13 +4,17 @@ import logging
 import root
 import conf
 
-def init_properties(_vars,_set,_get):
+
+def init_properties(cls,_set,_get):
     for section, option in conf.DEFAULT_CONFIGS_KEYS:
         qtype = conf.CONFIGS_TYPE_DICT[section][option]
         qsignal = Signal(qtype)
-        _vars[section + '__' + option + 'Cnanged'] = qsignal
-        _vars[section + '__' + option] = Property(conf.CONFIGS_TYPE_DICT[section][option],
-            partial(_set, section=section, option=option), partial(_get, section=section, option=option), notify = qsignal)
+        _get = Slot(qtype)(_get)
+        _set = Slot(result='qtype' )(_set)
+        setattr(cls, section + '__' + option + 'Cnanged', qsignal)
+        setattr(cls, section + '__' + option, Property(conf.CONFIGS_TYPE_DICT[section][option],
+            partial(_set, section=section, option=option),
+            partial(_get, section=section, option=option), notify = qsignal))
 
 class ConfigController(QObject):
     def __init__(self):
@@ -24,16 +28,18 @@ class ConfigController(QObject):
             return root.configuration.get(section, option)
 
     def _set(self, section, option, value):
+        if self._get(section, option) == value:
+            return
+        getattr(self,section+'__'+option+'Changed').emit(value)
         try:
             self.config_dict[section][option] = value
         except KeyError:
             logging.error('Unexpected config value: section=%s option=%s value=%s', section, option, value)
             raise
 
-    init_properties(vars(),_set,_get)
 
     @Slot(result='bool')
-    def save_change(self) -> bool:
+    def save_changes(self) -> bool:
         root.configuration.load_configs(self.config_dict)
         return root.configuration.save_configs()
 
@@ -48,3 +54,5 @@ class ConfigController(QObject):
     @Slot(result='QUrl')
     def get_configs_dir(self):
         return QUrl(str(root.CONFIGS_DIR))
+
+init_properties(ConfigController, ConfigController._set, ConfigController._get)

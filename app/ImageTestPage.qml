@@ -28,7 +28,7 @@ Item{
         },
         State {//该状态表示两张图片之间的间隔
             name: "interval"
-            PropertyChanges { image_test_timeline.currentFrame: attrs.answer_duration}
+            PropertyChanges { image_test_timeline.currentFrame: $config.image_test__answer_duration}
             PropertyChanges { interval_duration_animation.running: true}
             PropertyChanges { image_buttons.marked: true}
             PropertyChanges { image.source: "image://main/background" }
@@ -39,10 +39,6 @@ Item{
         property int current_turn_index: 1
         property int curr_turn_begin_time: 0
         property int total_turn_num: imageTester.image_num()
-        property int answer_duration: $config.get_int('image_test','answer_duration')
-        property int interval_duration: $config.get_int('image_test','interval_duration')
-        property bool if_end_immediately_after_answer: $config.get_bool('image_test', 'if_end_immediately_after_answer')
-        // property bool if_background_fill_view: $config.get_bool('image_test','if_background_fill_view')
     }
 
     Timeline{
@@ -50,19 +46,19 @@ Item{
         startFrame: 0
         currentFrame: 0
         enabled: true
-        endFrame: attrs.answer_duration + attrs.interval_duration + 1000
+        endFrame: $config.image_test__answer_duration + $config.image_test__interval_duration + 1000
 
         animations: [
             TimelineAnimation {
                 id: answer_duration_animation
                 running: true
-                duration: attrs.answer_duration
+                duration: $config.image_test__answer_duration
                 onFinished: image_test_root.enter_interval()
             },
             TimelineAnimation {
                 id: interval_duration_animation
                 running: false
-                duration: attrs.interval_duration
+                duration: $config.image_test__interval_duration
                 onFinished: image_test_root.enter_answering()
             }
         ]
@@ -114,7 +110,7 @@ Item{
             function button_clicked(user_tag){
                 if (!image_buttons.marked)
                     image_buttons.marked = true
-                    if (attrs.if_end_immediately_after_answer)
+                    if ($config.image_test__if_end_immediately_after_answer)
                         image_test_root.enter_interval()
                     imageTester.answer(attrs.current_turn_index-1, user_tag,
                          image_test_root.curr_time()-attrs.curr_turn_begin_time)

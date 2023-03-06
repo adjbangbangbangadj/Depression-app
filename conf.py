@@ -16,6 +16,9 @@ _DEBUG_CONFIGS_DICT = {
 }
 
 DEFAULT_CONFIGS_DICT = {
+    'general':{
+        'comform_before_test_end': False
+    },
     'image_test': {
         'image_dataset': 'CAPS',
         'pos_image_num': 7,
@@ -89,11 +92,7 @@ class ConfigManager:
     def get(self, section_name: str, option_name: str):
         return CONFIGS_TYPE_DICT[section_name][option_name](self.config[section_name][option_name])
 
-    def save_configs(self, json_config) -> bool:
-        edited_config_dict = json.loads(json_config)
-        edited_config = ConfigParser()
-        edited_config.read_dict(edited_config_dict)
-        self.config = edited_config_dict
+    def save_configs(self) -> bool:
         try:
             with open(self.config_path, 'w') as config_file:
                 self.config.write(config_file)
