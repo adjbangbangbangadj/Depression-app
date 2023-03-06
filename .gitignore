@@ -1,4 +1,5 @@
 /.idea
 /images
+/build
 /venv
 *.pyc

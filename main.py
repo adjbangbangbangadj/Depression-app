@@ -7,6 +7,8 @@ from PySide2.QtQml import QQmlApplicationEngine
 import sys
 import path
 import controller
+from data_service import config
+from service import api
 
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
@@ -19,6 +21,9 @@ if __name__ == "__main__":
 
     if(not path.result_fold):
         os.mkdir(r'%s/%s'%(os.getcwd(), "\\results\\"))
+
+    # if config.get_config("if_use_api"):
+    #     api.start()
 
     if not engine.rootObjects():
         sys.exit(-1)
