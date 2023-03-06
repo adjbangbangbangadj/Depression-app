@@ -6,12 +6,14 @@ from functools import partial
 from itertools import chain
 from pathlib import Path
 import random
+import root
 # import logging
 
 from root import DATA_DIR
 
 LABELS = ['pos', 'neu', 'neg']
 IMAGE_ROOT_DIR = DATA_DIR / Path('images/')
+root.check_dir(IMAGE_ROOT_DIR)
 
 def _construct_dirs(*paths):
     return {k: IMAGE_ROOT_DIR / Path(v) for k,v in zip(LABELS, paths)}

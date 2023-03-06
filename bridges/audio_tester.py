@@ -8,7 +8,7 @@ import logging
 import root
 
 QUESTION_DIR = root.DATA_DIR / Path('questions/')
-
+root.check_dir(QUESTION_DIR)
 
 Question = namedtuple('Question', ['name', 'question'])
 
