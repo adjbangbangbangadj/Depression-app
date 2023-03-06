@@ -39,9 +39,10 @@ Page{
         nameFilters: ["Configuration files (*.ini)"]
         Component.onCompleted: currentFolder = $config.get_configs_dir()
         onAccepted: {
-            if ($config.export_configs(export_file_dialog.selectedFile) == false)
-            export_failure_window.path = export_file_dialog.selectedFile
-            export_failure_window.visible = true
+            if (!$config.export_configs(export_file_dialog.selectedFile)){
+                export_failure_window.path = export_file_dialog.selectedFile
+                export_failure_window.visible = true
+            }
         }
     }
     FileDialog {
@@ -50,28 +51,29 @@ Page{
         nameFilters: ["Configuration files (*.ini)"]
         Component.onCompleted: currentFolder = $config.get_configs_dir()
         onAccepted: {
-            if ($config.import_configs(import_file_dialog.selectedFile) == false)
-            import_failure_window.path = import_file_dialog.selectedFile
-            import_failure_window.visible = true
+            if (!$config.import_configs(import_file_dialog.selectedFile)){
+                import_failure_window.path = import_file_dialog.selectedFile
+                import_failure_window.visible = true
+            }
         }
     }
     MessageDialog {
         id:export_failure_window
         property string path: ""
         title:  qsTr("设置导出失败")
-        text: qsTr("无法导出设置至" + path)
+        text: qsTr(`无法导出设置至${path}`)
         buttons: MessageDialog.Ok
     }
     MessageDialog {
         id:import_failure_window
         property string path: ""
         title: qsTr("设置导入失败")
-        text: qsTr("无法从" + path + "导入设置")
+        text: qsTr(`无法从${path}导入设置`)
         buttons: MessageDialog.Ok
     }
     MessageDialog {
         id:aboutwindow
-        title: "Depression Tester 2.0"
+        title: "Depression Tester 2.0 beta"
         text: "© 2023 Southeast University"
         buttons: MessageDialog.Ok
     }
@@ -102,10 +104,7 @@ Page{
             Layout.preferredHeight: homeStyle.mainButtonHeight
             Layout.alignment: Qt.AlignHCenter
             font.pointSize: homeStyle.titlePointSize
-            onClicked: {
-                root.setCurrentPage('test')
-                // $test_manager.test_start(name_input.text)
-            }
+            onClicked: root.setCurrentPage('test')
         }
 
         PromptTextInput{

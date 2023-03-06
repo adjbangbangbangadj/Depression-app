@@ -14,7 +14,7 @@ Window {
     property string username: ''
 
     function setCurrentPage(name){
-        let pages = {
+        const pages = {
             'home'      :'HomePage.qml',
             'test'      :'TestMain.qml',
             'settings'  :'SettingsPage.qml'

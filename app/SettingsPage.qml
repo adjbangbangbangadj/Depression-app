@@ -10,19 +10,26 @@ Page{
     property bool need_combine_image : true
     SettingsStyle{ id: settingsStyle }
     QtObject{
-        id: configs
-        property string image_dataset: "CAPS"
-        property int pos_image_num: 7
-        property int neu_image_num: 6
-        property int neg_image_num: 7
-        property bool if_same_neu_image_for_neu:true
-        property bool if_same_neu_image_for_background:true
-        property bool if_allowed_images_dup:false
-        property double answer_duration: 4.0
-        property double interval_duration: 3.0
-        property bool if_end_immediately_after_answer: true
-        property string background_color: "black"
-        property bool if_background_fill_view: false
+        id: image_test_config
+        // property string image_dataset: $config.image_test__image_dataset
+        property string image_dataset: $config.get_str('image_test', 'image_dataset')
+        property int pos_image_num: $config.get_int('image_test',"pos_image_num")
+        property int neu_image_num: $config.get_int('image_test',"neu_image_num")
+        property int neg_image_num: $config.get_int('image_test','neg_image_num')
+        property bool if_same_neu_image_for_neu: $config.get_bool('image_test','if_same_neu_image_for_neu')
+        property bool if_same_neu_image_for_background: $config.get_bool('image_test','if_same_neu_image_for_background')
+        property bool if_allowed_images_dup: $config.get_bool('image_test','if_allowed_images_dup')
+        property double answer_duration: $config.get_float('image_test','answer_duration')
+        property double interval_duration: $config.get_float('image_test','interval_duration')
+        property bool if_end_immediately_after_answer: $config.get_bool('image_test', 'if_end_immediately_after_answer')
+        property bool if_background_fill_view: $config.get_bool('image_test', 'if_background_fill_view')
+        property string background_color: $config.get_str('image_test', 'background_color')
+    }
+    QtObject{
+        id: _test_config
+        property string image_dataset: $config.get_str('image_test', 'image_dataset')
+        property int pos_image_num: $config.get_int('image_test',"pos_image_num")
+
     }
 
     property var confine:{

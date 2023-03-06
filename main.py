@@ -5,21 +5,24 @@ from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from pathlib import Path
 import sys
 
-import controller.config_controller as config_controller
-import vars
+import root
+import conf
 from bridges.image_tester import ImageTester
 from bridges.audio_tester import AudioTester
 from bridges.main_tester import MainTester
-from controller.file_utils import FileUtils
 from utils.neuracle_trigger import NeuracleTrigger
+from controller.file_utils_controller import FileUtilsController
+from controller.config_controller import ConfigController
 
 
 if __name__ == "__main__":
-    file_utils = FileUtils()
-    neuracle_trigger = NeuracleTrigger()
-    vars.configuration = config_controller.ConfigManager()
+    file_utils_controller = FileUtilsController()
+    config_controller = ConfigController()
 
-    app = QGuiApplication(sys.argv)
+    root.neuracle_trigger = NeuracleTrigger()
+    root.configuration = conf.ConfigManager(root.argv.debug)
+
+    app = QGuiApplication(root.qt_argv)
     engine = QQmlApplicationEngine()
 
     qmlRegisterType(ImageTester, 'Main', 1, 0, 'ImageTester')
@@ -27,12 +30,11 @@ if __name__ == "__main__":
     qmlRegisterType(MainTester, 'Main', 1, 0, 'MainTester')
 
     context = engine.rootContext()
-    context.setContextProperty("$file_utils", file_utils)
-    context.setContextProperty("$neuracle_trigger", neuracle_trigger)
-    context.setContextProperty("$config", vars.configuration)
+    context.setContextProperty("$file_utils", file_utils_controller)
+    context.setContextProperty("$config", config_controller)
 
-    engine.addImageProvider("main", vars.image_provider)
-    engine.load(str(vars.executable_path / Path("app/Main.qml")))
+    engine.addImageProvider("main", root.image_provider)
+    engine.load(str(root.EXECUTABLE_PATH / Path("app/Main.qml")))
 
     if not engine.rootObjects():
         sys.exit(-1)

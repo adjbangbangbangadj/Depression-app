@@ -7,20 +7,22 @@ import Main
 import 'style'
 
 Item{
-    anchors.margins: 100
     id: image_test_root
-
     Component.onCompleted: main_tester.subtest_start('image_test')
-    Component.onDestruction: main_tester.subtest_end('image_test')
+    Component.onDestruction: {
+        main_tester.subtest_end('image_test')
+        test_root.completed_tests.push('image_test')
+    }
 
     ImageTestStyle{ id: imageTestStyle }
+    ImageTester{ id: imageTester }
 
     states:  [
         State {//该状态表示正在选择图片
             name: "answering"
             PropertyChanges { image_test_timeline.currentFrame: 0}
             PropertyChanges { answer_duration_animation.running: true}
-            PropertyChanges { buttons.unmarked: true}
+            PropertyChanges { image_buttons.marked: false}
             PropertyChanges { image.source: `image://main/${attrs.current_turn_index - 1}`}
             PropertyChanges { attrs.curr_turn_begin_time: image_test_root.curr_time()}
         },
@@ -28,7 +30,7 @@ Item{
             name: "interval"
             PropertyChanges { image_test_timeline.currentFrame: attrs.answer_duration}
             PropertyChanges { interval_duration_animation.running: true}
-            PropertyChanges { buttons.unmarked: false}
+            PropertyChanges { image_buttons.marked: true}
             PropertyChanges { image.source: "image://main/background" }
         }
     ]
@@ -36,22 +38,18 @@ Item{
         id: attrs
         property int current_turn_index: 1
         property int curr_turn_begin_time: 0
-        property int total_turn_num: $config.get_int('image_test',"pos_image_num")+
-                $config.get_int('image_test',"neu_image_num") + $config.get_int('image_test','neg_image_num')
+        property int total_turn_num: imageTester.image_num()
         property int answer_duration: $config.get_int('image_test','answer_duration')
         property int interval_duration: $config.get_int('image_test','interval_duration')
         property bool if_end_immediately_after_answer: $config.get_bool('image_test', 'if_end_immediately_after_answer')
         // property bool if_background_fill_view: $config.get_bool('image_test','if_background_fill_view')
     }
-    ImageTester{
-        id: image_tester
-    }
+
     Timeline{
         id: image_test_timeline
         startFrame: 0
         currentFrame: 0
         enabled: true
-        // loop: Timeline
         endFrame: attrs.answer_duration + attrs.interval_duration + 1000
 
         animations: [
@@ -76,25 +74,22 @@ Item{
     }
 
     function enter_interval(){//本张图片结束，进入两张图片之间的间隔
-        if (attrs.current_turn_index < attrs.total_turn_num)
-            state = 'interval'
+        if (attrs.current_turn_index >= attrs.total_turn_num){
+            imageTester.save_result()
+            test_root.setCurrentPage('option')
+        }
         else
-            end_test()
+            state = 'interval'
     }
 
     function enter_answering(){//下一张图片
-        attrs.current_turn_index++
+        ++attrs.current_turn_index
         state = 'answering'
     }
 
-    function end_test(){
-        test_root.setCurrentPage('option')
-        // main_tester.subtest_end('image_test')
-    }
-
     RowLayout {
-        width: parent.width * 0.9
-        height: parent.height * 0.9
+        width: parent.width * imageTestStyle.testLayoutHProportion
+        height: parent.height * imageTestStyle.testLayoutVProportion
         anchors.centerIn:parent
 
         Image {
@@ -112,23 +107,17 @@ Item{
         Keys.onDigit3Pressed: button_neg.clicked()//数字键3表示消极
 
         ColumnLayout {
-            id: buttons
-            property bool unmarked: true
+            id: image_buttons
             spacing: imageTestStyle.buttonsSpacing
+            property bool marked: false
 
             function button_clicked(user_tag){
-
-                for (var prop in attrs) {
-                    print(prop += " (" + typeof(attrs[prop]) + ") = " + attrs[prop]);
-                }
-
-                if (buttons.unmarked)
-                    buttons.unmarked = false
+                if (!image_buttons.marked)
+                    image_buttons.marked = true
                     if (attrs.if_end_immediately_after_answer)
                         image_test_root.enter_interval()
-                    image_tester.answer(attrs.current_turn_index-1, user_tag,
+                    imageTester.answer(attrs.current_turn_index-1, user_tag,
                          image_test_root.curr_time()-attrs.curr_turn_begin_time)
-                    console.log(image_test_root.state)
             }
 
             Button {
@@ -137,8 +126,8 @@ Item{
                 font.pointSize: imageTestStyle.buttonTextSize
                 Layout.preferredHeight: imageTestStyle.buttonHeight
                 Layout.preferredWidth: imageTestStyle.buttonWidth
-                enabled: buttons.unmarked
-                onClicked: buttons.button_clicked('pos')
+                enabled: !image_buttons.marked
+                onClicked: image_buttons.button_clicked('pos')
             }
             Button {
                 id: button_neu
@@ -146,8 +135,8 @@ Item{
                 font.pointSize: imageTestStyle.buttonTextSize
                 Layout.preferredHeight: imageTestStyle.buttonHeight
                 Layout.preferredWidth: imageTestStyle.buttonWidth
-                enabled: buttons.unmarked
-                onClicked: buttons.button_clicked('neu')
+                enabled: !image_buttons.marked
+                onClicked: image_buttons.button_clicked('neu')
             }
             Button {
                 id: button_neg
@@ -155,8 +144,8 @@ Item{
                 font.pointSize: imageTestStyle.buttonTextSize
                 Layout.preferredHeight: imageTestStyle.buttonHeight
                 Layout.preferredWidth: imageTestStyle.buttonWidth
-                enabled: buttons.unmarked
-                onClicked: buttons.button_clicked('neg')
+                enabled: !image_buttons.marked
+                onClicked: image_buttons.button_clicked('neg')
             }
             Text {
                 id: prompt_turn_index

@@ -1,3 +1,4 @@
+from typing import overload
 from PySide6.QtGui import QImage
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QImage, QColor, QPainter
@@ -5,23 +6,48 @@ from functools import partial
 from itertools import chain
 from pathlib import Path
 import random
-import logging
+# import logging
 
-from vars import data_dir
+from root import DATA_DIR
 
-_lables = ['pos', 'neu', 'neg']
-_image_root_dir = data_dir / Path('images/')
+LABELS = ['pos', 'neu', 'neg']
+IMAGE_ROOT_DIR = DATA_DIR / Path('images/')
 
 def _construct_dirs(*paths):
-    return {k: _image_root_dir / Path(v) for k,v in zip(_lables, paths)}
+    return {k: IMAGE_ROOT_DIR / Path(v) for k,v in zip(LABELS, paths)}
 
 _image_dirs = _construct_dirs('en/pos/', 'en/neu/', 'images/en/neg')
 _female_image_dirs = _construct_dirs('ch/pos/female/','ch/neu/female/','ch/neg/female/')
 _male_image_dirs = _construct_dirs('ch/pos/male/','ch/neu/male/','ch/neg/male/')
 
 
-def ImageRecord(image_path:Path, label, user_tag='nil', duration=0)->dict:
-    return dict(image=QImage(str(image_path)), name=image_path.name, label=label, user_tag=user_tag, duration=duration)
+class ImageRecord:
+    @overload
+    def __init__(self, image_path:Path, label:str)-> None: ...
+
+    @overload
+    def __init__(self, qimage:QImage, name:dict, label:str)-> None: ...
+
+    def __init__(self, arg_1:Path, arg_2, arg_3=None)-> None:
+        if isinstance(arg_1, Path):
+            self.image=QImage(str(arg_1))
+            self.name=arg_1.name
+            self.label=arg_2
+        if isinstance(arg_1, QImage):
+            self.image=arg_1
+            self.name=arg_2
+            self.label=arg_3
+        self.user_tag = None
+        self.duration = None
+
+
+    def set_userinfo(self, user_tag, duration):
+        self.user_tag = user_tag
+        self.duration = duration
+
+    def get_saveinfo(self)->dict():
+        return
+
 
 def ImageNums(pos_num: int, neu_num: int, neg_num: int)->dict:
     return {'pos': pos_num, 'neu': neu_num, 'neg': neg_num}
@@ -104,7 +130,7 @@ def _preprocess_images(combined_needs: dict[str, int], image_dirs: dict[str, str
                                 f'is more than the number of available images {len(image_path)} for the {label} image!')
 
     return {label: [ImageRecord(path, label)
-                    for path in multiple_rounds_sample(image_paths[label], combined_needs[label])] for label in _lables}
+                    for path in multiple_rounds_sample(image_paths[label], combined_needs[label])] for label in LABELS}
 
 
 def _build_images(original_images: dict[str, list], image_nums: dict[str, int], *, if_same_neu_image_for_background: bool,
@@ -118,7 +144,7 @@ def _build_images(original_images: dict[str, list], image_nums: dict[str, int], 
     :return: 拼接后的图片，用于前端直接显示
     '''
     def _pre_combine_images(label: str) -> list:
-        def _combine_images_with_mark(main_image: QImage, background_images: list[QImage]) -> dict:
+        def _combine_images_with_mark(main_image:ImageRecord, background_images: list[ImageRecord]) -> ImageRecord:
             def _combine_images_drawing(image1: QImage, image2: QImage, image3: QImage, image4: QImage) -> QImage:
                 '''
                     拼接图片的具体函数，使用QPainter实现
@@ -126,14 +152,13 @@ def _build_images(original_images: dict[str, list], image_nums: dict[str, int], 
                 height = image1.height()
                 width = image1.width()
                 # print(image1.isNull())
-                # _combined_image = image1
                 _combined_image = QImage(width * 2, height * 2, image1.format())
                 _combined_image.fill(QColor('black'))
                 combined_painter = QPainter(_combined_image)
-                combined_painter.drawImage(0, 0, image1)
-                combined_painter.drawImage(0, height, image2)
-                combined_painter.drawImage(width, 0, image3)
-                combined_painter.drawImage(width, height, image4)
+                combined_painter.drawImage(0, 0, image1)            # top left
+                combined_painter.drawImage(width, 0, image2)        # top right
+                combined_painter.drawImage(0, height, image3)       # bottom left
+                combined_painter.drawImage(width, height, image4)   # bottom right
                 # print(_combined_image.isNull())
                 return _combined_image
 
@@ -144,13 +169,13 @@ def _build_images(original_images: dict[str, list], image_nums: dict[str, int], 
             elif len(background_images) == 3:
                 _images = [main_image] + background_images
             else:
-                raise Exception('argument error in combine_image function')
-            return {'image': _combine_images_drawing(*(random.sample([p['image'] for p in _images], 4))),
-                    'label': main_image['label'],
-                    'main_image_name': main_image['name'],
-                    'neu_image1_name': _images[0]['name'],
-                    'neu_image2_name': _images[1]['name'],
-                    'neu_image3_name': _images[2]['name']}
+                raise Exception('argument pattern dismatched in combine_image function')
+
+            random.shuffle(_images)
+            _combined_image:QImage = _combine_images_drawing(*[i.image for i in _images])
+            # name order is top-left, top-right, bottom-left, bottom-right
+            _name = '+'.join([i.name for i in _images])
+            return ImageRecord(_combined_image, _name, main_image.label)
 
         if label in ['pos', 'neg']:
             return [_combine_images_with_mark(original_images[label].pop(0),
@@ -165,8 +190,8 @@ def _build_images(original_images: dict[str, list], image_nums: dict[str, int], 
                     for _ in range(image_nums['neu'])]
 
     # logging.debug('fn _build_images completed.\n' +
-    #                '\n'.join([f'{label}:{len(original_images[label])}' for label in _lables]))
-    temp = list(chain(*[_pre_combine_images(label) for label in _lables]))
+    #                '\n'.join([f'{label}:{len(original_images[label])}' for label in LABELS]))
+    temp = list(chain(*[_pre_combine_images(label) for label in LABELS]))
     random.shuffle(temp)
     return temp
 

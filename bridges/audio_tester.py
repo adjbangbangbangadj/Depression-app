@@ -1,36 +1,71 @@
 from PySide6.QtCore import QObject, Slot
 from utils.audio_recorder import AudioRecorderThread
 from pathlib import Path
-from vars import configuration, data_dir
+from functools import partial
+from collections import namedtuple
+from random import shuffle
 import logging
+import root
 
-_question_dir = data_dir / Path ('questions/')
+QUESTION_DIR = root.DATA_DIR / Path('questions/')
+
+
+Question = namedtuple('Question', ['name', 'question'])
+
 
 class AudioTester(QObject):
     def __init__(self):
         super().__init__()
+        self.conf = partial(root.configuration.get, 'audio_test')
         self.question: list = []
-        for i in _question_dir.glob('*.txt'):
-            ...
-        # opennnnnnnnn questions
+        self.current_index = 0
+        self.recorder:AudioRecorderThread = None
+        for i in QUESTION_DIR.glob('*.txt'):
+            try:
+                with open(i, 'r') as file:
+                    self.question.append(Question(i.stem, file.read()))
+            except OSError:
+                logging.warning(
+                    f'cannot read question file {i}. skiped the file.')
 
-    @Slot(result='QString')
-    def get_questiion(self, index):
-        return self.question[index]
+        if self.conf('if_shuffle_questions'):
+            shuffle(self.question)
 
-    @Slot(str)
-    def start_record(self, file_name) -> None:
-        if self.recorder:
-            logging.warning()
+    @Slot(result='int')
+    def question_num(self):
+        return len(self.question)
+
+    @Slot(int, result='QString')
+    def get_question(self, index): # TODO:优化前端使其不再触发IndexError
+        try:
+            return self.question[index].question
+        except:
+            return 'IndexError: list index out of range'
+
+    @Slot(int)
+    def start_record(self, question_index) -> None:
+        logging.debug(f'AudioTester started record: question_index={question_index}')
+        self.current_index = question_index
+        file_name = self.question[question_index].name
+        if self.recorder and self.recorder.is_alive():
+            logging.warning('try to start recording audio when already started')
             return
-        self.recorder = AudioRecorderThread(vars.test_info.result_dir / Path(file_name + '.wav'))
+        self.recorder = AudioRecorderThread(
+            root.test_info.result_dir / Path(file_name + '.wav'))
+        root.neuracle_trigger.mark(f'question_{question_index}_start')
         self.recorder.start()
 
     @Slot()
     def end_record(self) -> None:
-        if not self.recorder:
-            logging.warning()
+        logging.debug(f'AudioTester ended record')
+        if not(self.recorder and self.recorder.is_alive()):
+            logging.warning('try to end recording audio when already ended')
             return
-        self.recorder.end()
+        root.neuracle_trigger.mark(f'question_{self.current_index}_end')
+        try:
+            self.recorder.end()
+        except:
+            logging.error('error happend in ending recording audio.')
+            raise
 
 

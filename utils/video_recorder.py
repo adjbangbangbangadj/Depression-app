@@ -1,24 +1,27 @@
+import logging
 import cv2
 import threading
 
+
 class VideoCaptureThread(threading.Thread):
-    def __init__(self, output_file, video_source = 0):
+    def __init__(self, output_file, video_source=0):
         super().__init__()
         self.setDaemon(True)
         self.flag = True
-        self.output_file = output_file
+        self.output_file = str(output_file)
         self.video_source = video_source
         self.capture = cv2.VideoCapture(self.video_source)
         self.fps = int(self.capture.get(cv2.CAP_PROP_FPS))
         self.width = int(self.capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.video_writer = cv2.VideoWriter(self.output_file, cv2.VideoWriter_fourcc(*'XVID'), self.fps, (self.width, self.height))
+        self.video_writer = cv2.VideoWriter(self.output_file, cv2.VideoWriter_fourcc(
+            *'XVID'), self.fps, (self.width, self.height))
 
     def run(self):
         self.flag = True
         while self.flag:
             ret, frame = self.capture.read()
-            frame = cv2.flip(frame, 1) #水平翻转
+            frame = cv2.flip(frame, 1)  # 水平翻转
             if ret:
                 self.video_writer.write(frame)
             else:
@@ -28,5 +31,6 @@ class VideoCaptureThread(threading.Thread):
 
     def end(self):
         self.flag = False
-
-
+        self.join(1)
+        if self.is_alive():
+            logging.warning("VideoCaptureThread not end unexpertedly")
