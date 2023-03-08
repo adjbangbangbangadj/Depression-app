@@ -4,13 +4,13 @@ import QtQuick.Controls 2.15
 
 SpinBox {
     id: spinbox
-    value: 110
+    value: 0
     from: 0
-    to: 100 * 100
-    stepSize: 100
+    to: 1000 * 1000
+    stepSize: scale
 
+    property int scale: 1000
     property int decimals: 2
-    property double doubleValue: value / 100
 
     validator: DoubleValidator {
         bottom: Math.min(spinbox.from, spinbox.to)
@@ -18,10 +18,10 @@ SpinBox {
     }
 
     textFromValue: function(value, locale) {
-        return Number(value / 100).toLocaleString(locale, 'f', spinbox.decimals)
+        return Number(value / scale).toLocaleString(locale, 'f', spinbox.decimals)
     }
 
     valueFromText: function(text, locale) {
-        return Number.fromLocaleString(locale, text) * 100
+        return Number.fromLocaleString(locale, text) * scale
     }
 }

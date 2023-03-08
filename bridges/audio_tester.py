@@ -3,7 +3,6 @@ from utils.audio_recorder import AudioRecorderThread
 from pathlib import Path
 from functools import partial
 from collections import namedtuple
-from random import shuffle
 import logging
 import root
 
@@ -20,6 +19,9 @@ class AudioTester(QObject):
         self.question: list = []
         self.current_index = 0
         self.recorder:AudioRecorderThread = None
+        question_files = list(QUESTION_DIR.glob('*.txt')) # return value of glob() is in arbitrary order
+        if not self.conf('if_shuffle_questions'):
+            question_files.sort()
         for i in QUESTION_DIR.glob('*.txt'):
             try:
                 with open(i, 'r') as file:
@@ -27,9 +29,6 @@ class AudioTester(QObject):
             except OSError:
                 logging.warning(
                     f'cannot read question file {i}. skiped the file.')
-
-        if self.conf('if_shuffle_questions'):
-            shuffle(self.question)
 
     @Slot(result='int')
     def question_num(self):

@@ -18,9 +18,9 @@ root.check_dir(IMAGE_ROOT_DIR)
 def _construct_dirs(*paths):
     return {k: IMAGE_ROOT_DIR / Path(v) for k,v in zip(LABELS, paths)}
 
-_image_dirs = _construct_dirs('en/pos/', 'en/neu/', 'images/en/neg')
-_female_image_dirs = _construct_dirs('ch/pos/female/','ch/neu/female/','ch/neg/female/')
-_male_image_dirs = _construct_dirs('ch/pos/male/','ch/neu/male/','ch/neg/male/')
+_image_dirs = _construct_dirs('KDEF/pos/', 'KDEF/neu/', 'images/KDEF/neg')
+_female_image_dirs = _construct_dirs('CAPS/pos/female/','CAPS/neu/female/','CAPS/neg/female/')
+_male_image_dirs = _construct_dirs('CAPS/pos/male/','CAPS/neu/male/','CAPS/neg/male/')
 
 
 class ImageRecord:
@@ -234,14 +234,14 @@ def build_images_consider_gender(pos_num: int, neu_num: int, neg_num: int, **kar
     return temp
 
 
-def build_background_image(size: QSize, qformat: QImage.Format, background_color: str) -> QImage:
+def build_background_image(size: QSize, qformat: QImage.Format, interval_background_color: str) -> QImage:
     '''
     构建两张测试图片之间的背景（默认是黑色）
     '''
     background = QImage(size, qformat)
-    if not background_color:
-        background_color = 'white'
-    background.fill(QColor(background_color))
+    if not interval_background_color:
+        interval_background_color = 'white'
+    background.fill(QColor(interval_background_color))
     return background
 
 # if_same_neu_image_for_background, if_same_neu_image_for_neu = True, False

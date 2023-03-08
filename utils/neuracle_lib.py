@@ -10,7 +10,6 @@
 
 import serial
 import serial.tools.list_ports
-import time
 import logging
 from ctypes import *
 

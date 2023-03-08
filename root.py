@@ -15,6 +15,23 @@ LOGS_DIR = EXECUTABLE_PATH / Path('logs')
 CONFIGS_DIR = EXECUTABLE_PATH / Path('conf')
 RESULTS_DIR = EXECUTABLE_PATH / Path('results')
 
+
+def check_dir(path: Path, raise_if_nonexsit: bool = False):
+    if not path.is_dir():
+        if raise_if_nonexsit:
+            raise OSError(f'can not find {path} directory')
+        else:
+            try:
+                path.mkdir()
+            except OSError:
+                logging.error(f'can not create {path} directory')
+                raise
+
+
+for d in [DATA_DIR, LOGS_DIR, CONFIGS_DIR, RESULTS_DIR]:
+    check_dir(d)
+
+
 neuracle_trigger = None
 configuration = None
 
@@ -50,22 +67,6 @@ def excepthook(exc_type, exc_value, exc_traceback):
 
 
 sys.excepthook = excepthook
-
-
-def check_dir(path: Path, raise_if_nonexsit: bool = False):
-    if not path.is_dir():
-        if raise_if_nonexsit:
-            raise OSError(f'can not find {path} directory')
-        else:
-            try:
-                RESULTS_DIR.mkdir()
-            except OSError:
-                logging.error(f'can not create {path} directory')
-                raise
-
-
-for d in [DATA_DIR, LOGS_DIR, CONFIGS_DIR, RESULTS_DIR]:
-    check_dir(d)
 
 
 def TestInfo(username, begin_time=None):

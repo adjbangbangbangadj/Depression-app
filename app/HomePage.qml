@@ -110,9 +110,9 @@ Page{
         PromptTextInput{
             id: name_input
             Layout.alignment: Qt.AlignHCenter
+            Layout.maximumWidth: homeStyle.mainButtonWidth
+            Layout.preferredHeight: homeStyle.mainButtonHeight
             pointSize: homeStyle.titlePointSize
-            inputHeight: 34
-            inputWidth: 120
             textPrompt.text: qsTr("姓名：")
             textInput.text: root.username
         }

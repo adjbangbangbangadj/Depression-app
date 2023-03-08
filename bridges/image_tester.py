@@ -28,7 +28,7 @@ class ImageTester(QObject):
         # 构建并保存背景
         sample = self.image_infos[0].image
         self.interval_background = build_background_image(
-            sample.size(), sample.format(), self.conf("background_color"))
+            sample.size(), sample.format(), self.conf("interval_background_color"))
         # push image to ImageProvider
         for index, item in enumerate(self.image_infos):
             root.image_provider.set_image(index, item.image)

@@ -6,10 +6,10 @@ import QtQuick.Dialogs
 import "style"
 import Main
 
-Item{
+Control{
     ColumnLayout {
-        id: option_page
         TestMainStyle{ id: testMainStyle }
+        id: option_page
 
         width: testMainStyle.mainLayoutWidth
         height: testMainStyle.optionLayoutHeight
@@ -49,9 +49,9 @@ Item{
             Layout.alignment:Qt.AlignHCenter
             font.pointSize: testMainStyle.titlePointSize
             onClicked: {
-                if ($config.general__comform_before_test_end &&
+                if ($config.general__if_confirm_before_test_end &&
                     test_root.uncompleted_tests.length === 0)
-                    comform_test_end_dialog.visible = true
+                    confirm_test_end_dialog.visible = true
                 else
                     root.setCurrentPage('home')
             }
@@ -62,7 +62,7 @@ Item{
         }
 
         MessageDialog {
-            id: comform_test_end_dialog
+            id: confirm_test_end_dialog
             text: qsTr("是否结束测试?")
             detailedText:  qsTr(`还有${format(test_root.uncompleted_tests)}未完成`)
 
@@ -74,7 +74,7 @@ Item{
                 tests = tests.map(i => testname_en2ch[i])
                 switch (tests.length) {
                     case 0:
-                    return 'null';
+                    return null;
                     case 1:
                     return tests[0];
                     case 2:

@@ -17,7 +17,8 @@ _DEBUG_CONFIGS_DICT = {
 
 DEFAULT_CONFIGS_DICT = {
     'general':{
-        'comform_before_test_end': False
+        'app_signture': 'DepressionTester',
+        'if_confirm_before_test_end': False
     },
     'image_test': {
         'image_dataset': 'CAPS',
@@ -30,8 +31,8 @@ DEFAULT_CONFIGS_DICT = {
         'answer_duration': 4000,
         'interval_duration': 3000,
         'if_end_immediately_after_answer': True,
-        'background_color': 'black',
-        'if_background_fill_view': False,
+        'interval_background_color': 'black',
+        'if_interval_background_fill_view': False,
         'if_record_video': True,
     },
     'audio_test': {
@@ -39,6 +40,7 @@ DEFAULT_CONFIGS_DICT = {
         'if_record_video': True,
     }
 }
+
 
 def get_config_type(value):
     if type(value) is int:
@@ -52,14 +54,11 @@ def get_config_type(value):
 
 CONFIGS_TYPE_DICT = {k1:{k2:get_config_type(v2) for k2,v2 in v1.items()} for k1,v1 in DEFAULT_CONFIGS_DICT.items()}
 
-def get_config_keys(config_dict) -> list[tuple[str,str]]:
-    config_keys = set()
+def nested_iterator(config_dict):
     for section_name, section_proxy in config_dict.items():
-        for option_name in section_proxy.keys():
-            config_keys.add((section_name, option_name))
-    return config_keys
+        for option_name, value in section_proxy.items():
+            yield (section_name, option_name, value)
 
-DEFAULT_CONFIGS_KEYS = get_config_keys(DEFAULT_CONFIGS_DICT)
 
 class ConfigManager:
     def __init__(self, using_debug_config:bool=False):
@@ -71,26 +70,46 @@ class ConfigManager:
         if using_debug_config:
             self.config.read_dict(_DEBUG_CONFIGS_DICT)
 
-    def load_configs(self, new_config, strict=False, using_default=False):
+    def load_configs(self, loaded_config, check_signture=True, strict=False, using_default=False):
         new_config = ConfigParser()
-        if not strict and using_default:
-            new_config.read_dict(DEFAULT_CONFIGS_DICT)
-        if isinstance(new_config, str):
-            new_config.read(new_config)
-        else: # ConfigParser, dict
-            new_config.read_dict(new_config)
-        new_config_keys = get_config_keys(new_config)
-        for i in DEFAULT_CONFIGS_KEYS:
-            if i not in new_config_keys:
+        if isinstance(loaded_config, str) or isinstance(loaded_config, Path):
+            new_config.read(loaded_config)
+        else: #isinstance(loaded_config, dict) or isinstance(loaded_config, ConfigParser):
+            new_config.read_dict(loaded_config)
+        if check_signture:
+            try:
+                if not new_config['general']['app_signture'] == 'DepressionTester':
+                    raise RuntimeError('wrong config file. app signture dismatched.')
+            except KeyError:
+                raise RuntimeError('wrong config file. cannot find app signture.')
+        for section, option in nested_iterator(DEFAULT_CONFIGS_DICT):
+            try:
+                new_config[section][option]
+            except KeyError:
                 error_msg = 'option not find when read config: [%s][%s]' % i
                 if strict:
                     raise RuntimeError(error_msg)
                 else:
                     logging.warning(error_msg)
+        if not strict and using_default:
+            new_config_with_default = ConfigParser()
+            new_config_with_default.read_dict(DEFAULT_CONFIGS_DICT)
+            new_config = new_config_with_default.read_dict(new_config)
         self.config = new_config
 
+    def set(self, section_name: str, option_name: str, value):
+        self.config.set(section_name, option_name, value)
+
     def get(self, section_name: str, option_name: str):
-        return CONFIGS_TYPE_DICT[section_name][option_name](self.config[section_name][option_name])
+        config_type = CONFIGS_TYPE_DICT[section_name][option_name]
+        if config_type == bool:
+            return self.config.getboolean(section_name, option_name)
+        if config_type == float:
+            return self.config.getfloat(section_name, option_name)
+        if config_type == int:
+            return self.config.getint(section_name, option_name)
+        else: #config_type = str
+            return self.config.get(section_name, option_name)
 
     def save_configs(self) -> bool:
         try:
@@ -104,10 +123,8 @@ class ConfigManager:
 
     def import_configs(self, import_path) -> bool:
         import_path = Path(import_path)
-        new_config = ConfigParser()
-        new_config.read_file(root.CONFIGS_DIR / Path('app.cfg'))
         try:
-            self.load_configs(new_config, strict=True)
+            self.load_configs(import_path) #TODO:provide version support check
         except RuntimeError as e:
             logging.error(str(e))
             logging.error(f'cannot import configs from {import_path}')

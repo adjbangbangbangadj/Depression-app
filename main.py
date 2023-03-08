@@ -16,11 +16,11 @@ from controller.config_controller import ConfigController
 
 
 if __name__ == "__main__":
-    file_utils_controller = FileUtilsController()
-    config_controller = ConfigController()
-
     root.neuracle_trigger = NeuracleTrigger()
     root.configuration = conf.ConfigManager(root.argv.debug)
+
+    file_utils_controller = FileUtilsController()
+    config_controller = ConfigController()
 
     app = QGuiApplication(root.qt_argv)
     engine = QQmlApplicationEngine()

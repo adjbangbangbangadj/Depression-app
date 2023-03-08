@@ -1,25 +1,33 @@
 from PySide6.QtCore import QObject, Slot, QUrl, Property, Signal
 from functools import partial
-import logging
 import root
 import conf
 
+_PROPERTY_NAME = '{section}__{option}'
+_SIGNAL_NAME = _PROPERTY_NAME + 'Changed'
+_SETTER_NAME = 'set_' + _PROPERTY_NAME
+_GETTER_NAME = 'get_' + _PROPERTY_NAME
+_QTYPE_PARAM2RESULT = {'str':'QString'}
 
-def init_properties(cls,_set,_get):
-    for section, option in conf.DEFAULT_CONFIGS_KEYS:
-        qtype = conf.CONFIGS_TYPE_DICT[section][option]
-        qsignal = Signal(qtype)
-        _get = Slot(qtype)(_get)
-        _set = Slot(result='qtype' )(_set)
-        setattr(cls, section + '__' + option + 'Cnanged', qsignal)
-        setattr(cls, section + '__' + option, Property(conf.CONFIGS_TYPE_DICT[section][option],
-            partial(_set, section=section, option=option),
-            partial(_get, section=section, option=option), notify = qsignal))
+
+def init_properties(namespace, _set, _get):
+    for section, option, _ in conf.nested_iterator(conf.DEFAULT_CONFIGS_DICT):
+        param_qtype = conf.CONFIGS_TYPE_DICT[section][option]
+        result_qtype = _QTYPE_PARAM2RESULT.get(param_qtype.__name__, param_qtype.__name__)
+        qsignal = Signal(param_qtype)
+        qgetter = Slot(result=result_qtype)(partial(_get, section=section, option=option))
+        qsetter = Slot(param_qtype)(partial(_set, section=section, option=option))
+        namespace[_SIGNAL_NAME.format(section=section, option=option)]=qsignal
+        namespace[_GETTER_NAME.format(section=section, option=option)]=qgetter
+        namespace[_SETTER_NAME.format(section=section, option=option)]=qsetter
+        namespace[_PROPERTY_NAME.format(section=section, option=option)]=\
+            Property(result_qtype, qgetter, qsetter, notify = qsignal)
 
 class ConfigController(QObject):
     def __init__(self):
         super().__init__()
-        self.config_dict: dict[str, dict] = conf.DEFAULT_CONFIGS_DICT
+        self. tt = 't'
+        self.config_dict: dict[str, dict] = {}
 
     def _get(self, section, option):
         try:
@@ -27,20 +35,39 @@ class ConfigController(QObject):
         except KeyError:
             return root.configuration.get(section, option)
 
-    def _set(self, section, option, value):
+    def _set(self, value, section, option):
         if self._get(section, option) == value:
             return
-        getattr(self,section+'__'+option+'Changed').emit(value)
+        getattr(self, _SIGNAL_NAME.format(section=section, option=option)).emit(value)
         try:
-            self.config_dict[section][option] = value
+            self.config_dict[section]
         except KeyError:
-            logging.error('Unexpected config value: section=%s option=%s value=%s', section, option, value)
-            raise
+            self.config_dict[section] = {option:value}
+        else:
+            self.config_dict[section][option]=value
+
+    init_properties(locals(),_set,_get)
+
+    def reset_configs(self, new_configs):
+        for section_name,section_proxy in self.new_configs.items():
+            for option_name, value in section_proxy.items():
+                getattr(self, _SETTER_NAME.format(section=section_name, option=option_name))\
+                    (section_name, option_name, value)
+
+    @Slot()
+    def reset_to_default(self):
+        self.reset_configs(conf.DEFAULT_CONFIGS_DICT)
+
+    @Slot()
+    def cancel_changes(self):
+        self.reset_configs(root.configuration.config)
 
 
     @Slot(result='bool')
     def save_changes(self) -> bool:
-        root.configuration.load_configs(self.config_dict)
+        for section_name,section_proxy in self.config_dict.items():
+            for option_name, value in section_proxy.items():
+                root.configuration.set(section_name, option_name, value)
         return root.configuration.save_configs()
 
     @Slot(str, result='bool')
@@ -55,4 +82,3 @@ class ConfigController(QObject):
     def get_configs_dir(self):
         return QUrl(str(root.CONFIGS_DIR))
 
-init_properties(ConfigController, ConfigController._set, ConfigController._get)

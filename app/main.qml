@@ -1,5 +1,11 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
+// import QtQuick.Controls.Basic     2.12
+// import QtQuick.Controls.Fusion    2.12
+// import QtQuick.Controls.Imagine   2.12
+// import QtQuick.Controls.Material  2.12
+// import QtQuick.Controls.Universal 2.12
+// import QtQuick.Controls.Windows   2.12
 
 Window {
     id: root
@@ -20,7 +26,6 @@ Window {
             'settings'  :'SettingsPage.qml'
         }
         main_page_loader.source = pages[name]
-
     }
 
     Loader {

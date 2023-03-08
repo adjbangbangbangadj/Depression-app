@@ -7,7 +7,7 @@ import Main
 import 'style'
 
 
-Item{
+Pane{
     id: audio_test_root
     Component.onCompleted: main_tester.subtest_start('audio_test')
     Component.onDestruction: {
@@ -31,16 +31,20 @@ Item{
     }
 
     ColumnLayout {
-        width: parent.width * audioTestStyle.testLayoutHProportion
-        height: parent.height * audioTestStyle.testLayoutVProportion
+        width: parent.width * audioTestStyle.pageHProportion
+        height: parent.height * audioTestStyle.pageVProportion
         anchors.centerIn:parent
+
+        Item {
+            Layout.preferredHeight: audioTestStyle.questionTopMargin
+        }
 
         Text {
             id: question
             font.pointSize: audioTestStyle.questionPointSize
             wrapMode: Text.Wrap
             Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             text: qsTr(String(attrs.current_turn_index + 1) + '. ' + audioTester.get_question(attrs.current_turn_index))
         }
 

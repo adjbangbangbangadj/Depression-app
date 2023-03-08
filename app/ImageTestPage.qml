@@ -6,7 +6,7 @@ import QtQuick.Timeline 1.0
 import Main
 import 'style'
 
-Item{
+Pane {
     id: image_test_root
     Component.onCompleted: main_tester.subtest_start('image_test')
     Component.onDestruction: {
@@ -84,8 +84,8 @@ Item{
     }
 
     RowLayout {
-        width: parent.width * imageTestStyle.testLayoutHProportion
-        height: parent.height * imageTestStyle.testLayoutVProportion
+        width: parent.width * imageTestStyle.pageHProportion
+        height: parent.height * imageTestStyle.pageVProportion
         anchors.centerIn:parent
 
         Image {
