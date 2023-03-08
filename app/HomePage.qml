@@ -73,7 +73,7 @@ Page{
     }
     MessageDialog {
         id:aboutwindow
-        title: "Depression Tester 2.0 beta"
+        title: "Depression Tester 2.0"
         text: "© 2023 Southeast University"
         buttons: MessageDialog.Ok
     }

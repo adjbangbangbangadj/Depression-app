@@ -95,7 +95,6 @@ class ImageProvider(QQuickImageProvider):
     def set_image(self, name, value):
         self.images[str(name)] = value
 
-
 image_provider = ImageProvider()
 
 

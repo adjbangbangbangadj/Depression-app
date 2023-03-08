@@ -18,10 +18,12 @@ root.check_dir(IMAGE_ROOT_DIR)
 def _construct_dirs(*paths):
     return {k: IMAGE_ROOT_DIR / Path(v) for k,v in zip(LABELS, paths)}
 
-_image_dirs = _construct_dirs('KDEF/pos/', 'KDEF/neu/', 'images/KDEF/neg')
+_image_dirs = _construct_dirs('KDEF/pos/', 'KDEF/neu/', 'KDEF/neg')
 _female_image_dirs = _construct_dirs('CAPS/pos/female/','CAPS/neu/female/','CAPS/neg/female/')
 _male_image_dirs = _construct_dirs('CAPS/pos/male/','CAPS/neu/male/','CAPS/neg/male/')
 
+_IMAGE_FILE_SUFFIX = ['jpg', 'jpeg', 'png', 'gif']
+_IMAGE_FILE_SUFFIX.extend([i.upper() for i in _IMAGE_FILE_SUFFIX])
 
 class ImageRecord:
     @overload
@@ -62,12 +64,9 @@ def multiple_rounds_sample(population:list, k: int):
     else:
         return random.sample(population, len(population)) + multiple_rounds_sample(population, k - len(population))
 
-_image_file_suffix = ['jpg', 'jpeg', 'png', 'gif']
-_image_file_suffix.extend([i.upper() for i in _image_file_suffix])
-
 def _get_image_path(image_dir: str) -> list[Path]:
     images = []
-    for suffix in _image_file_suffix:
+    for suffix in _IMAGE_FILE_SUFFIX:
         images.extend(image_dir.glob('*.' + suffix))
     return images
 

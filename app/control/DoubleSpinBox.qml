@@ -13,8 +13,8 @@ SpinBox {
     property int decimals: 2
 
     validator: DoubleValidator {
-        bottom: Math.min(spinbox.from, spinbox.to)
-        top:  Math.max(spinbox.from, spinbox.to)
+        top: spinbox.from
+        bottom:  spinbox.to
     }
 
     textFromValue: function(value, locale) {

@@ -113,10 +113,15 @@ Control{
                         id: prompt_total_time
                         font.pointSize: settingsStyle.textPointSize
                         function format_time(total_time) {
-                            let formatted = `最大总时间: ${Math.floor(total_time / 60)} 分钟`;
-                            if (total_time % 60 !== 0)
-                                formatted += ` ${total_time % 60} 秒`;
+                            const minutes = Math.floor(total_time / 60)
+                            const seconds = Math.floor(total_time % 60 *100) /100 // 0.003 consider as 0
+                            let formatted = '最大总时间:'
+                            if (minutes !== 0)
+                                formatted += ` ${minutes} 分钟`
+                            if (seconds !== 0 || minutes === 0)
+                                formatted += ` ${seconds} 秒`
                             return formatted;
+
                         }
 
                         text:qsTr(format_time(Math.max((($config.image_test__pos_image_num+
@@ -134,7 +139,8 @@ Control{
                         Layout.preferredWidth: settingsStyle.settingsBoxWidth
                         Layout.preferredHeight: settingsStyle.settingsBoxHeight
                         editable:true
-                        from:0; to:settings_root.confine["pos"]
+                        from: 0
+                        to: settings_root.confine["pos"]
                         value: $config.image_test__pos_image_num
                         onValueModified:{ $config.image_test__pos_image_num = value}
                     }
@@ -148,7 +154,8 @@ Control{
                         Layout.preferredWidth: settingsStyle.settingsBoxWidth
                         Layout.preferredHeight: settingsStyle.settingsBoxHeight
                         editable:true
-                        from:0; to:settings_root.confine["neu"]
+                        from: 0
+                        to: settings_root.confine["neu"]
                         value: $config.image_test__neu_image_num
                         onValueModified:{ $config.image_test__neu_image_num = value}
                     }
@@ -162,7 +169,8 @@ Control{
                         Layout.preferredWidth: settingsStyle.settingsBoxWidth
                         Layout.preferredHeight: settingsStyle.settingsBoxHeight
                         editable:true
-                        from:0; to:settings_root.confine["neg"]
+                        from: 0
+                        to: settings_root.confine["neg"]
                         value: $config.image_test__neg_image_num
                         onValueModified:{ $config.image_test__neg_image_num = value}
                     }
@@ -177,6 +185,7 @@ Control{
                         Layout.preferredHeight: settingsStyle.settingsBoxHeight
                         font.pointSize: settingsStyle.textPointSize
                         editable:true
+                        from: 1
                         value: $config.image_test__answer_duration
                         onValueModified: $config.image_test__answer_duration = value
                     }
@@ -190,6 +199,7 @@ Control{
                         Layout.preferredHeight: settingsStyle.settingsBoxHeight
                         font.pointSize: settingsStyle.textPointSize
                         editable: true
+                        from: 1
                         value: $config.image_test__interval_duration
                         onValueModified: $config.image_test__interval_duration = value
                     }

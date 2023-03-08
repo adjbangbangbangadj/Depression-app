@@ -24,7 +24,6 @@ Item {
         test_page_loader.source = pages[name]
     }
 
-
     Loader {
         id: test_page_loader
         anchors.fill:parent
