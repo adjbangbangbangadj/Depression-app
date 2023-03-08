@@ -13,6 +13,7 @@ TEST_LIST = ['image_test','audio_test']
 class MainTester(QObject):
     def __init__(self):
         super().__init__()
+        self.video_recorder = None
         self.video_record_skiped = []
         for test_name in TEST_LIST:
             self.video_record_skiped.append(not root.configuration.get(test_name,_IF_RECORD_VIDEO_CONFIG_NAME))
@@ -20,7 +21,6 @@ class MainTester(QObject):
 
     @Slot(str)
     def test_start(self, username):
-        self.video_recorder = None
         root.test_info = root.TestInfo(username)
         logging.info('test started. username:%s begin_time:%s',
                      username or _USERNAME_PLACEHOLDER, root.test_info.begin_time)
@@ -59,6 +59,13 @@ class MainTester(QObject):
             except:
                 logging.error('error happend in ending capturing video.')
                 raise
+
+    @Slot()
+    def test_end(self):
+        logging.info('test ended. username:%s begin_time:%s',
+                     root.test_info.username or _USERNAME_PLACEHOLDER, root.test_info.begin_time)
+        if root.test_info.result_dir.is_dir() and not any(root.test_info.result_dir.iterdir()):
+            root.test_info.result_dir.rmdir()
 
     @Slot(result='QString')
     def get_tests(self)->str:

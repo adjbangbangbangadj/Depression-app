@@ -9,6 +9,7 @@ Item {
     MainTester {
         id: main_tester
         Component.onCompleted: main_tester.test_start(root.username)
+        Component.onDestruction: main_tester.test_end()
     }
     property var tests: JSON.parse(main_tester.get_tests())
     property var completed_tests: []

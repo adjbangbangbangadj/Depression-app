@@ -5,8 +5,8 @@ import conf
 
 _PROPERTY_NAME = '{section}__{option}'
 _SIGNAL_NAME = _PROPERTY_NAME + 'Changed'
-_SETTER_NAME = 'set_' + _PROPERTY_NAME
-_GETTER_NAME = 'get_' + _PROPERTY_NAME
+_SETTER_NAME = 'set__' + _PROPERTY_NAME
+_GETTER_NAME = 'get__' + _PROPERTY_NAME
 _QTYPE_PARAM2RESULT = {'str':'QString'}
 
 
@@ -26,7 +26,6 @@ def init_properties(namespace, _set, _get):
 class ConfigController(QObject):
     def __init__(self):
         super().__init__()
-        self. tt = 't'
         self.config_dict: dict[str, dict] = {}
 
     def _get(self, section, option):
@@ -38,21 +37,20 @@ class ConfigController(QObject):
     def _set(self, value, section, option):
         if self._get(section, option) == value:
             return
-        getattr(self, _SIGNAL_NAME.format(section=section, option=option)).emit(value)
         try:
             self.config_dict[section]
         except KeyError:
-            self.config_dict[section] = {option:value}
+            self.config_dict[section] = {option: value}
         else:
             self.config_dict[section][option]=value
+        getattr(self, _SIGNAL_NAME.format(section=section, option=option)).emit(value)
 
-    init_properties(locals(),_set,_get)
+    init_properties(locals(), _set, _get)
 
     def reset_configs(self, new_configs):
-        for section_name,section_proxy in self.new_configs.items():
+        for section_name,section_proxy in new_configs.items():
             for option_name, value in section_proxy.items():
-                getattr(self, _SETTER_NAME.format(section=section_name, option=option_name))\
-                    (section_name, option_name, value)
+                getattr(self, _SETTER_NAME.format(section=section_name, option=option_name))(self, value)
 
     @Slot()
     def reset_to_default(self):
@@ -60,7 +58,7 @@ class ConfigController(QObject):
 
     @Slot()
     def cancel_changes(self):
-        self.reset_configs(root.configuration.config)
+        self.reset_configs(root.configuration.get_configs())
 
 
     @Slot(result='bool')
@@ -72,11 +70,11 @@ class ConfigController(QObject):
 
     @Slot(str, result='bool')
     def import_configs(self, import_path) -> bool:
-        return self.config.import_configs(import_path)
+        return root.configuration.import_configs(QUrl(import_path).toLocalFile())
 
     @Slot(str, result='bool')
     def export_configs(self, export_path) -> bool:
-        return self.config.export_configs(export_path)
+        return root.configuration.export_configs(QUrl(export_path).toLocalFile())
 
     @Slot(result='QUrl')
     def get_configs_dir(self):

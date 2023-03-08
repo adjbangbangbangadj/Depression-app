@@ -10,9 +10,7 @@ Control{
     Page{
         id: settings_root
         SettingsStyle{ id: settingsStyle }
-        background : Rectangle {
-            color: settingsStyle.background_color
-        }
+        background : Rectangle {color: settingsStyle.background_color}
         width: parent.width * settingsStyle.pageHProportion
         height: parent.height * settingsStyle.pageVProportion
         anchors.centerIn:parent
@@ -94,6 +92,9 @@ Control{
                         valueRole: "value"
                         font.pointSize: settingsStyle.textPointSize
                         Layout.preferredHeight: settingsStyle.settingsBoxHeight
+                        Component.onCompleted: currentIndex = indexOfValue($config.image_test__image_dataset)
+                        currentIndex : currentIndex = indexOfValue($config.image_test__image_dataset)
+                        onActivated: $config.image_test__image_dataset = currentValue
                         model: [
                             { value: "CAPS", text: qsTr("Chinese Affective Picture System") },
                             { value: "KDEF", text: qsTr("The Karolinska Directed Emotional Faces") },
@@ -107,7 +108,22 @@ Control{
                         text:qsTr(`总图片数: ${$config.image_test__pos_image_num+$config.image_test__neu_image_num+
                             $config.image_test__neg_image_num} `)
                     }
-                    Item {}
+
+                    Text {
+                        id: prompt_total_time
+                        font.pointSize: settingsStyle.textPointSize
+                        function format_time(total_time) {
+                            let formatted = `最大总时间: ${Math.floor(total_time / 60)} 分钟`;
+                            if (total_time % 60 !== 0)
+                                formatted += ` ${total_time % 60} 秒`;
+                            return formatted;
+                        }
+
+                        text:qsTr(format_time(Math.max((($config.image_test__pos_image_num+
+                            $config.image_test__neu_image_num+$config.image_test__neg_image_num)*
+                            ($config.image_test__answer_duration+$config.image_test__interval_duration)-
+                            $config.image_test__interval_duration)/1000,0)))
+                    }
                     Text {
                         text: qsTr("积极图片数")
                         font.pointSize: settingsStyle.textPointSize
@@ -120,7 +136,6 @@ Control{
                         editable:true
                         from:0; to:settings_root.confine["pos"]
                         value: $config.image_test__pos_image_num
-                        Component.onCompleted: value= $config.image_test__pos_image_num
                         onValueModified:{ $config.image_test__pos_image_num = value}
                     }
                     Text {
@@ -135,7 +150,6 @@ Control{
                         editable:true
                         from:0; to:settings_root.confine["neu"]
                         value: $config.image_test__neu_image_num
-                        Component.onCompleted: value= $config.image_test__neu_image_num
                         onValueModified:{ $config.image_test__neu_image_num = value}
                     }
                     Text {
@@ -150,9 +164,46 @@ Control{
                         editable:true
                         from:0; to:settings_root.confine["neg"]
                         value: $config.image_test__neg_image_num
-                        Component.onCompleted: value= $config.image_test__neg_image_num
                         onValueModified:{ $config.image_test__neg_image_num = value}
                     }
+
+                    Text {
+                        text: qsTr("每张图片作答时长（单位秒）")
+                        font.pointSize: settingsStyle.textPointSize
+                    }
+                    DoubleSpinBox{
+                        id: input_answer_duration
+                        Layout.preferredWidth: settingsStyle.settingsBoxWidth
+                        Layout.preferredHeight: settingsStyle.settingsBoxHeight
+                        font.pointSize: settingsStyle.textPointSize
+                        editable:true
+                        value: $config.image_test__answer_duration
+                        onValueModified: $config.image_test__answer_duration = value
+                    }
+                    Text {
+                        text: qsTr("两张图片间隔时长（单位秒）")
+                        font.pointSize: settingsStyle.textPointSize
+                    }
+                    DoubleSpinBox{
+                        id: input_interval_duration
+                        Layout.preferredWidth: settingsStyle.settingsBoxWidth
+                        Layout.preferredHeight: settingsStyle.settingsBoxHeight
+                        font.pointSize: settingsStyle.textPointSize
+                        editable: true
+                        value: $config.image_test__interval_duration
+                        onValueModified: $config.image_test__interval_duration = value
+                    }
+                    Text {
+                        text: qsTr("在图片作答后立刻结束对该图片的作答")
+                        font.pointSize: settingsStyle.textPointSize
+                    }
+                    CheckBox {
+                        id: checkBox_if_end_immediately
+                        Layout.preferredHeight: settingsStyle.settingsBoxHeight
+                        checked: $config.image_test__if_end_immediately_after_answer
+                        onCheckedChanged: $config.image_test__if_end_immediately_after_answer = checked
+                    }
+
                     Text {
                         text: qsTr("在组合图片时使用相同的三张中性图片")
                         font.pointSize: settingsStyle.textPointSize
@@ -185,50 +236,8 @@ Control{
                         checked: $config.image_test__if_allowed_images_dup
                         onCheckedChanged: $config.image_test__if_allowed_images_dup = checked
                     }
-                    Text {
-                        id: prompt_total_time
-                        font.pointSize: settingsStyle.textPointSize
-                        text:qsTr(`最大总时间:${(($config.image_test__pos_image_num+$config.image_test__neu_image_num+
-                            $config.image_test__neg_image_num)*($config.image_test__answer_duration+
-                            $config.image_test__interval_duration)-$config.image_test__interval_duration)/1000} 秒`)
-                    }
-                    Item {}
-                    Text {
-                        text: qsTr("每张图片作答时长（单位秒）")
-                        font.pointSize: settingsStyle.textPointSize
-                    }
-                    DoubleSpinBox{
-                        id: input_answer_duration
-                        Layout.preferredWidth: settingsStyle.settingsBoxWidth
-                        Layout.preferredHeight: settingsStyle.settingsBoxHeight
-                        font.pointSize: settingsStyle.textPointSize
-                        editable:true
-                        Component.onCompleted: value= $config.image_test__answer_duration
-                        onValueModified: $config.image_test__answer_duration = value
-                    }
-                    Text {
-                        text: qsTr("两张图片间隔时长（单位秒）")
-                        font.pointSize: settingsStyle.textPointSize
-                    }
-                    DoubleSpinBox{
-                        id: input_interval_duration
-                        Layout.preferredWidth: settingsStyle.settingsBoxWidth
-                        Layout.preferredHeight: settingsStyle.settingsBoxHeight
-                        font.pointSize: settingsStyle.textPointSize
-                        editable: true
-                        Component.onCompleted: value= $config.image_test__interval_duration
-                        onValueModified: $config.image_test__interval_duration = value
-                    }
-                    Text {
-                        text: qsTr("在图片作答后立刻结束对该图片的作答")
-                        font.pointSize: settingsStyle.textPointSize
-                    }
-                    CheckBox {
-                        id: checkBox_if_end_immediately
-                        Layout.preferredHeight: settingsStyle.settingsBoxHeight
-                        checked: $config.image_test__if_end_immediately_after_answer
-                        onCheckedChanged: $config.image_test__if_end_immediately_after_answer = checked
-                    }
+
+
                     // Text {
                     //     text: qsTr("if_interval_background_fill_view")
                     //     font.pointSize: settingsStyle.textPointSize
@@ -312,15 +321,6 @@ Control{
                 Layout.fillWidth: true
             }
             Button {
-                id: button_test
-                font.pointSize: settingsStyle.textPointSize
-                Layout.preferredWidth: settingsStyle.settingsButtonWidth
-                text: qsTr("值")
-                onClicked: {
-                    console.log(JSON.stringify($config))
-                }
-            }
-            Button {
                 id: button_reset
                 font.pointSize: settingsStyle.textPointSize
                 Layout.preferredWidth: settingsStyle.settingsButtonWidth
@@ -332,7 +332,10 @@ Control{
                 font.pointSize: settingsStyle.textPointSize
                 Layout.preferredWidth: settingsStyle.settingsButtonWidth
                 text: qsTr("取消")
-                onClicked: root.setCurrentPage('home')
+                onClicked: {
+                    $config.cancel_changes()
+                    root.setCurrentPage('home')
+                }
             }
             Button {
                 id: button_save

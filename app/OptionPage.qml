@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 2.15
 import QtQuick.Dialogs
 
+
 import "style"
 import Main
 
@@ -50,7 +51,7 @@ Control{
             font.pointSize: testMainStyle.titlePointSize
             onClicked: {
                 if ($config.general__if_confirm_before_test_end &&
-                    test_root.uncompleted_tests.length === 0)
+                    test_root.uncompleted_tests.length !== 0)
                     confirm_test_end_dialog.visible = true
                 else
                     root.setCurrentPage('home')
@@ -63,8 +64,8 @@ Control{
 
         MessageDialog {
             id: confirm_test_end_dialog
-            text: qsTr("是否结束测试?")
-            detailedText:  qsTr(`还有${format(test_root.uncompleted_tests)}未完成`)
+            title: qsTr("是否结束测试?")
+            text:  qsTr(`还有${format(test_root.uncompleted_tests)}未完成`)
 
             function format(tests) {
                 const testname_en2ch = {
