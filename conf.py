@@ -115,7 +115,7 @@ class ConfigManager:
 
     def save_configs(self) -> bool:
         try:
-            with open(self.config_path, 'w') as config_file:
+            with open(self.config_path, 'w', encoding='UTF-8') as config_file:
                 self.config.write(config_file)
             return True
         except:
@@ -136,7 +136,7 @@ class ConfigManager:
     def export_configs(self, export_path) -> bool:
         export_path = Path(export_path)
         try:
-            with open(export_path, 'w') as config_file:
+            with open(export_path, 'w', encoding='utf-8') as config_file:
                 self.config.write(config_file)
             return True
         except OSError as e:
