@@ -12,7 +12,6 @@ RowLayout{
         text:promptText
     }
     Rectangle {
-        id:r
         Layout.fillWidth: true
         Layout.preferredHeight: parent.height * 1.25
         border.color: "black"

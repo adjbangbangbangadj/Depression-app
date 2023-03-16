@@ -34,11 +34,19 @@ class ImageTester(QObject):
             root.image_provider.set_image(index, item.image)
         root.image_provider.set_image('background', self.interval_background)
 
+    @Slot(int)
+    def turn_start(self, current_turn):
+        logging.debug(f'image test turn start:{current_turn}')
+        # root.neuracle_trigger.mark(11000 + current_turn)
+        root.neuracle_trigger.mark(0)
+
     @Slot(int, str, int)
     def answer(self, image_index, user_tag, duration):
         logging.debug('ImageTester collected the user answer: image_index=%s, user_tag=%s, duration=%s' %
                       (image_index, user_tag,duration))
-        root.neuracle_trigger.mark('image_' + str(image_index))
+        # root.neuracle_trigger.mark('image_' + str(image_index))
+        # root.neuracle_trigger.mark(12000 + image_index)
+        root.neuracle_trigger.mark(1)
         image:ImageRecord = self.image_infos[image_index]
         image.user_tag = user_tag
         image.duration = duration

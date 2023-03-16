@@ -80,6 +80,7 @@ Pane {
 
     function enter_answering(){//下一张图片
         ++attrs.current_turn_index
+        imageTester.turn_start(attrs.current_turn_index)
         state = 'answering'
     }
 

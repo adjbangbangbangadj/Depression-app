@@ -19,7 +19,7 @@ DEFAULT_CONFIGS_DICT = {
         'if_confirm_before_test_end': False
     },
     'image_test': {
-        'image_dataset': 'CAPS',
+        'image_dataset': 'KDEF',
         'pos_image_num': 7,
         'neu_image_num': 6,
         'neg_image_num': 7,

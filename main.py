@@ -34,7 +34,7 @@ if __name__ == "__main__":
     context.setContextProperty("$config", config_controller)
 
     engine.addImageProvider("main", root.image_provider)
-    engine.load(str(root.EXECUTABLE_PATH / Path("app/Main.qml")))
+    engine.load(str(root.EXECUTABLE_PATH / Path("app/main.qml")))
 
     if not engine.rootObjects():
         sys.exit(-1)

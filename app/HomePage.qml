@@ -115,6 +115,7 @@ Page{
             pointSize: homeStyle.titlePointSize
             textPrompt.text: qsTr("姓名：")
             textInput.text: root.username
+            textInput.onEditingFinished: root.username = textInput.text
         }
 
         Item{ //work like QSpacerItem

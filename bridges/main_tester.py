@@ -31,7 +31,7 @@ class MainTester(QObject):
             logging.warning(f'unexpected test_name argument: {test_name}')
         logging.info('%s test started. username:%s begin_time:%s', test_name,
                      root.test_info.username or _USERNAME_PLACEHOLDER, root.test_info.begin_time)
-        root.neuracle_trigger.mark(test_name + '_start')
+        # root.neuracle_trigger.mark(test_name + '_start')
         if test_name not in self.video_record_skiped:
             if self.video_recorder and self.video_recorder.is_alive():
                 logging.warning(
@@ -49,7 +49,7 @@ class MainTester(QObject):
         logging.info('%s test finished. user_id:%s begin_time:%s\nresults saved to %s',
                      test_name, root.test_info.username or _USERNAME_PLACEHOLDER,
                      root.test_info.begin_time, root.test_info.result_dir)
-        root.neuracle_trigger.mark(test_name + '_end')
+        # root.neuracle_trigger.mark(test_name + '_end')
         if test_name not in self.video_record_skiped:
             if not (self.video_recorder and self.video_recorder.is_alive()):
                 logging.warning('try to end capturing video when already ended')

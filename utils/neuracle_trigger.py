@@ -16,7 +16,7 @@ class NeuracleTrigger():
             except:
                 logging.warning('Cannot init the Neuracle trigger box.')
 
-    def mark(self, value: str) -> None:
+    def mark(self, value: int) -> None:
         logging.debug(f'Try to send event data {value} to the Neuracle trigger box.')
         if _trigger_box:
             try:
@@ -24,4 +24,4 @@ class NeuracleTrigger():
             except:
                 logging.warning('Cannot init the Neuracle trigger box.')
         else:
-            logging.warning('The Neuracle trigger box not connected. Cannot send event data.')
+            logging.warning(f'The Neuracle trigger box not connected. Cannot send event data: {value}')

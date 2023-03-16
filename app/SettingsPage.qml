@@ -93,7 +93,7 @@ Control{
                         font.pointSize: settingsStyle.textPointSize
                         Layout.preferredHeight: settingsStyle.settingsBoxHeight
                         Component.onCompleted: currentIndex = indexOfValue($config.image_test__image_dataset)
-                        currentIndex : currentIndex = indexOfValue($config.image_test__image_dataset)
+                        currentIndex: indexOfValue($config.image_test__image_dataset) // not have effect
                         onActivated: $config.image_test__image_dataset = currentValue
                         model: [
                             { value: "CAPS", text: qsTr("Chinese Affective Picture System") },

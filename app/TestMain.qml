@@ -5,7 +5,7 @@ import Main
 
 Item {
     id: test_root
-
+    Component.onDestruction: root.username = ''
     MainTester {
         id: main_tester
         Component.onCompleted: main_tester.test_start(root.username)

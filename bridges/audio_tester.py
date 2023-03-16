@@ -51,7 +51,8 @@ class AudioTester(QObject):
             return
         self.recorder = AudioRecorderThread(
             root.test_info.result_dir / Path(file_name + '.wav'))
-        root.neuracle_trigger.mark(f'question_{question_index}_start')
+        # root.neuracle_trigger.mark(f'question_{question_index}_start')
+        root.neuracle_trigger.mark(3)
         self.recorder.start()
 
     @Slot()
@@ -60,7 +61,8 @@ class AudioTester(QObject):
         if not(self.recorder and self.recorder.is_alive()):
             logging.warning('try to end recording audio when already ended')
             return
-        root.neuracle_trigger.mark(f'question_{self.current_index}_end')
+        # root.neuracle_trigger.mark(f'question_{self.current_index}_end')
+        root.neuracle_trigger.mark(4)
         try:
             self.recorder.end()
         except:
