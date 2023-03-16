@@ -24,7 +24,7 @@ class AudioTester(QObject):
             question_files.sort()
         for i in QUESTION_DIR.glob('*.txt'):
             try:
-                with open(i, 'r') as file:
+                with open(i, 'r', encoding='UTF-8') as file:
                     self.question.append(Question(i.stem, file.read()))
             except OSError:
                 logging.warning(
