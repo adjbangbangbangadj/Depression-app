@@ -11,7 +11,7 @@ from bridges.image_tester import ImageTester
 from bridges.audio_tester import AudioTester
 from bridges.main_tester import MainTester
 from utils.neuracle_trigger import NeuracleTrigger
-from controller.file_utils_controller import FileUtilsController
+from controller.utils_controller import UtilsController
 from controller.config_controller import ConfigController
 
 
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     root.neuracle_trigger = NeuracleTrigger()
     root.configuration = conf.ConfigManager(root.argv.debug)
 
-    file_utils_controller = FileUtilsController()
+    utils_controller = UtilsController()
     config_controller = ConfigController()
 
     app = QGuiApplication(root.qt_argv)
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     qmlRegisterType(MainTester, 'Main', 1, 0, 'MainTester')
 
     context = engine.rootContext()
-    context.setContextProperty("$file_utils", file_utils_controller)
+    context.setContextProperty("$utils", utils_controller)
     context.setContextProperty("$config", config_controller)
 
     engine.addImageProvider("main", root.image_provider)

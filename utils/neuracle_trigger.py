@@ -15,13 +15,20 @@ class NeuracleTrigger():
                 _trigger_box = TriggerBox("COM4")
             except:
                 logging.warning('Cannot init the Neuracle trigger box.')
+            else:
+                return True
 
     def mark(self, value: int) -> None:
         logging.debug(f'Try to send event data {value} to the Neuracle trigger box.')
         if _trigger_box:
-            try:
-                _trigger_box.output_event_data(value)
-            except:
-                logging.warning('Cannot init the Neuracle trigger box.')
+            self._mark(value)
         else:
-            logging.warning(f'The Neuracle trigger box not connected. Cannot send event data: {value}')
+            logging.warning("the Neuracle trigger box didn't init correctly. retry to init.")
+            if self.connect():
+                self._mark(value)
+
+    def _mark(self, value):
+        try:
+            _trigger_box.output_event_data(value)
+        except:
+            logging.warning(f'Cannot init the Neuracle trigger box. Event data: {value}.')

@@ -83,8 +83,8 @@ Pane{
                 Layout.preferredWidth: audioTestStyle.buttonWidth
                 enabled: true
                 onClicked: {
-                    audio_bottons.state = 'recording'
                     audioTester.start_record(attrs.current_turn_index)
+                    audio_bottons.state = 'recording'
                 }
             }
             Button{

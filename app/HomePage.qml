@@ -14,9 +14,9 @@ Page{
         Menu {
             title: qsTr("文件")
             font.pointSize: homeStyle.textPointSize
-            Action { text: qsTr("打开结果目录"); onTriggered: $file_utils.open_results_dir()}
-            Action { text: qsTr("打开日志目录"); onTriggered: $file_utils.open_log_dir()}
-            Action { text: qsTr("打开数据目录"); onTriggered: $file_utils.open_data_dir()}
+            Action { text: qsTr("打开结果目录"); onTriggered: $utils.open_results_dir()}
+            Action { text: qsTr("打开日志目录"); onTriggered: $utils.open_log_dir()}
+            Action { text: qsTr("打开数据目录"); onTriggered: $utils.open_data_dir()}
         }
         Menu {
             title: qsTr("设置")
@@ -25,6 +25,11 @@ Page{
             MenuSeparator {}
             Action { text: qsTr("导出设置"); onTriggered: export_file_dialog.open()}
             Action { text: qsTr("载入设置"); onTriggered: import_file_dialog.open()}
+        }
+        Menu {
+            title: qsTr("工具")
+            font.pointSize: homeStyle.textPointSize
+            Action { text: qsTr("打标测试"); onTriggered: $utils.mark_test() }
         }
         Menu {
             title: qsTr("关于")
@@ -73,7 +78,7 @@ Page{
     }
     MessageDialog {
         id:aboutwindow
-        title: "Depression Tester 2.0.2"
+        title: "Depression Tester 2.0.3"
         text: "© 2023 Southeast University"
         buttons: MessageDialog.Ok
     }
