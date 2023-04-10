@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, Slot
 import root
 import subprocess
+# from utils.neuracle_trigger import NeuracleTrigger
 
 class UtilsController(QObject):
     @Slot()
@@ -15,7 +16,7 @@ class UtilsController(QObject):
     def open_log_dir(self):
         subprocess.Popen(f'explorer "{str(root.LOGS_DIR)}"')
 
-    @Slot()
+    @Slot(result='bool')
     def mark_test(self):
-        root.neuracle_trigger.mark(0)
+        return root.neuracle_trigger.mark(0)
 

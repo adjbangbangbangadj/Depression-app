@@ -29,7 +29,14 @@ Page{
         Menu {
             title: qsTr("工具")
             font.pointSize: homeStyle.textPointSize
-            Action { text: qsTr("打标测试"); onTriggered: $utils.mark_test() }
+            Action { text: qsTr("打标测试");
+                onTriggered:{
+                    if($utils.mark_test())
+                        marktest_success_window.visible = true
+                    else
+                        marktest_failure_window.visible = true
+                }
+            }
         }
         Menu {
             title: qsTr("关于")
@@ -77,9 +84,21 @@ Page{
         buttons: MessageDialog.Ok
     }
     MessageDialog {
-        id:aboutwindow
-        title: "Depression Tester 2.0.3"
-        text: "© 2023 Southeast University"
+        id: aboutwindow
+        title:  qsTr("Depression Tester 2.0.4")
+        text:  qsTr("Copyright © 2023 3L&Z. All rights reserved.")
+        buttons: MessageDialog.Ok
+    }
+    MessageDialog {
+        id: marktest_success_window
+        title: qsTr("打标测试成功")
+        text: qsTr("程序无异常")
+        buttons: MessageDialog.Ok
+    }
+    MessageDialog {
+        id: marktest_failure_window
+        title: qsTr("打标测试失败")
+        text: qsTr("程序存在异常，请查看日志文件")
         buttons: MessageDialog.Ok
     }
     // Loader {

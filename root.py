@@ -48,7 +48,10 @@ def start():
     file_logger = logging.FileHandler(
         LOGS_DIR / Path(date.today().strftime("%Y-%m") + '.log'))
     file_logger.setFormatter(formatter)
-    file_logger.setLevel(logging.WARNING)
+    if argv.verbose:
+        file_logger.setLevel(logging.DEBUG)
+    else:
+        file_logger.setLevel(logging.WARNING)
     logger.addHandler(file_logger)
     console_logger = logging.StreamHandler()
     console_logger.setFormatter(formatter)
